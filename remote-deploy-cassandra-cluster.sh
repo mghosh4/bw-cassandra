@@ -4,21 +4,13 @@
 # 2014-08-19 Yosub       Initial version
 # 2015-03-10 Yosub       Updated for BW-Cassandra project
 
-CASSANDRA_SRC_DIR_BASE=/Users/Daniel/Dropbox/Illinois/courses/cs525/project/
-CASSANDRA_SRC_DIR_NAME=apache-cassandra-2.1.3
-#CASSANDRA_SRC_DIR=${CASSANDRA_SRC_DIR_BASE}/${CASSANDRA_SRC_DIR_NAME}
-CASSANDRA_SRC_TAR_FILE=apache-cassandra-2.1.3.tar.gz
-SSH_USER=yossupp
-SSH_URL=node-0.bw-cassandra.ISS.emulab.net
-REMOTE_BASE_DIR=/proj/ISS/shin14/bw-cassandra
-REMOTE_SCRIPT_DIR=${REMOTE_BASE_DIR}
-REMOTE_REDEPLOY_SCRIPT=${REMOTE_SCRIPT_DIR}/redeploy-node-script.sh
-REMOTE_DEPLOY_CLUSTER_SCRIPT=${REMOTE_SCRIPT_DIR}/deploy-cassandra-cluster.sh
-CASSANDRA_HOME=/opt/cassandra
-
 for i in "$@"
 do
 case $i in
+    --local_base_path=*)
+    LOCAL_BASE_PATH="${i#*=}"
+    shift
+    ;;
     --cluster_size=*)
     CLUSTER_SIZE="${i#*=}"
     shift
@@ -32,6 +24,19 @@ case $i in
     ;;
 esac
 done
+
+
+CASSANDRA_SRC_DIR_BASE=${LOCAL_BASE_PATH}
+CASSANDRA_SRC_DIR_NAME=apache-cassandra-2.1.3
+#CASSANDRA_SRC_DIR=${CASSANDRA_SRC_DIR_BASE}/${CASSANDRA_SRC_DIR_NAME}
+CASSANDRA_SRC_TAR_FILE=apache-cassandra-2.1.3.tar.gz
+SSH_USER=yossupp
+SSH_URL=node-0.bw-cassandra.ISS.emulab.net
+REMOTE_BASE_DIR=/proj/ISS/shin14/bw-cassandra
+REMOTE_SCRIPT_DIR=${REMOTE_BASE_DIR}
+REMOTE_REDEPLOY_SCRIPT=${REMOTE_SCRIPT_DIR}/redeploy-node-script.sh
+REMOTE_DEPLOY_CLUSTER_SCRIPT=${REMOTE_SCRIPT_DIR}/deploy-cassandra-cluster.sh
+CASSANDRA_HOME=/opt/cassandra
 
 echo "## Remote deploying Cassandra cluster with cluster_size=${CLUSTER_SIZE}, active_cluster_size=${ACTIVE_CLUSTER_SIZE}"
 

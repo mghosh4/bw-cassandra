@@ -17,6 +17,7 @@ tc = TwilioRestClient(private_config.get('twilio', 'account_sid'), private_confi
 workload_types = ['uniform', 'zipfian', 'latest', 'readonly']
 throughputs = [1000, 2500, 5000, 7500, 10000]
 
+local_base_path = config.get('path', 'local_base_path')
 local_result_path = config.get('path', 'local_result_path')
 local_raw_result_path = local_result_path + '/raw'
 local_processed_result_path = local_result_path + '/processed'
@@ -33,8 +34,9 @@ default_replication_factor = int(config.get('experiment', 'default_replication_f
 def run_experiment(cluster_size, active_cluster_size, throughput, workload_type, num_records, replication_factor):
     # Executing hard reset of Cassandra cluster on Emulab
     print 'Executing hard reset of Cassandra cluster on Emulab'
-    ret = os.system('./remote-deploy-cassandra-cluster.sh --cluster_size=%d --active_cluster_size=%d --throughput=%d'
-                    % (cluster_size, active_cluster_size, throughput))
+    ret = os.system('./remote-deploy-cassandra-cluster.sh'
+                    ' --local_base_path=%s --cluster_size=%d --active_cluster_size=%d --throughput=%d'
+                    % (local_base_path, cluster_size, active_cluster_size, throughput))
     if ret != 0:
         raise Exception('Unable to finish remote-deploy-cassandra-cluster.sh')
 
