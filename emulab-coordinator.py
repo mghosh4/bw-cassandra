@@ -1,5 +1,5 @@
 import os
-from time import strftime
+from time import strftime, sleep
 import subprocess
 import ConfigParser
 import StringIO
@@ -38,6 +38,9 @@ def run_experiment(cluster_size, active_cluster_size, throughput, workload_type,
     if ret != 0:
         raise Exception('Unable to finish remote-deploy-cassandra-cluster.sh')
 
+    # Grace period for Cassandra to startup before starting YCSB workload
+    sleep(10)
+
     output_dir_name = strftime('%m-%d-%H%M')
     output_dir_path = '/tmp/' + output_dir_name
     # SSH into server and run YCSB script
@@ -56,9 +59,9 @@ def run_experiment(cluster_size, active_cluster_size, throughput, workload_type,
         result = ycsb_parser.parse_execution_output(buf)
 
     finally:
-        os.system('ssh yossupp@node-0.cassandra-morphous.ISS.emulab.net \'tar -czf %s.tar.gz -C %s %s \''
+        os.system('ssh yossupp@node-0.bw-cassandra.ISS.emulab.net \'tar -czf %s.tar.gz -C %s %s \''
                   % (output_dir_path, '/tmp', output_dir_name))
-        os.system('scp yossupp@node-0.cassandra-morphous.ISS.emulab.net:%s.tar.gz %s/'
+        os.system('scp yossupp@node-0.bw-cassandra.ISS.emulab.net:%s.tar.gz %s/'
                   % (output_dir_path, local_raw_result_path))
         os.system('tar -xzf %s/%s.tar.gz -C %s/' % (local_raw_result_path, output_dir_name, local_raw_result_path))
         os.system('rm -f %s/%s.tar.gz' % (local_raw_result_path, output_dir_name))
