@@ -3,7 +3,6 @@ from time import strftime
 import subprocess
 import ConfigParser
 import StringIO
-import pandas as pd
 import ycsb_parser
 from twilio.rest import TwilioRestClient
 
@@ -84,16 +83,6 @@ def experiment_on_throughput(csv_file_name, repeat):
                                     num_records=default_num_records,
                                     workload_type=default_workload_type,
                                     replication_factor=default_replication_factor)
-            append_row_to_csv(csv_file_name, result)
-
-
-def append_row_to_csv(csv_file_name, row):
-    df = pd.DataFrame([row])
-    if os.path.isfile(csv_file_name):
-        with open(csv_file_name, 'a') as f:
-            df.to_csv(f, header=False)
-    else:
-        df.to_csv(csv_file_name)
 
 
 def main():
