@@ -48,11 +48,17 @@ def run_experiment(active_cluster_size, throughput, workload_type, num_records, 
     output_dir_name = strftime('%m-%d-%H%M')
     output_dir_path = remote_base_path + '/data/' + output_dir_name
 
+    # Running Cassandra cluster
+    print 'Running Cassandra'
+    ret = os.system('bw-deploy-cassandra-cluster.sh')
+    if ret != 0:
+        raise Exception('Unable to execute Cassandra')
+
     # Running YCSB script
     print 'Running YCSB script'
-    ret = os.system('%s/bw-ycsb-script.sh '
+    ret = os.system('bw-ycsb-script.sh '
                     '--base_path=%s --throughput=%s --num_records=%d --workload=%s --replication_factor=%d'
-                    % (remote_base_path, output_dir_path, throughput, num_records, workload_type, replication_factor))
+                    % (output_dir_path, throughput, num_records, workload_type, replication_factor))
     if ret != 0:
         raise Exception('Unable to finish YCSB script')
 

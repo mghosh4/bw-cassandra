@@ -46,7 +46,7 @@ export PATH=$PATH:/u/sciteam/shin1/scratch/jdk1.7.0_65
 /u/sciteam/shin1/scratch/apache-cassandra-2.1.3/bin/cassandra
 
 # Run YCSB script
-sh /u/sciteam/shin1/scratch/bw-ycsb-script.sh --base_path=/u/sciteam/shin1/scratch/data --throughput=1000 --num_records=1000000 --workload=zipfian --replication_factor=1
+sh /u/sciteam/shin1/scratch/bw-ycsb-script.sh --base_path=/u/sciteam/shin1/scratch/data --throughput=5000 --num_records=100000 --workload=zipfian --replication_factor=1
 
 # # Create keyspace and column family for YCSB
 
