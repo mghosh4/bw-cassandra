@@ -4,14 +4,12 @@ import subprocess
 import ConfigParser
 import StringIO
 import ycsb_parser
-from twilio.rest import TwilioRestClient
 
 config = ConfigParser.SafeConfigParser()
 config.read('bw-config.ini')
 
 private_config = ConfigParser.SafeConfigParser()
 private_config.read('private.ini')
-tc = TwilioRestClient(private_config.get('twilio', 'account_sid'), private_config.get('twilio', 'auth_token'))
 
 workload_types = ['uniform', 'zipfian', 'latest', 'readonly']
 throughputs = [100, 500, 1000, 2500, 5000, 7500, 10000]
