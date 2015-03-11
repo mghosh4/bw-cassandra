@@ -1,5 +1,5 @@
 import os
-from time import strftime
+from time import strftime, sleep
 import subprocess
 import ConfigParser
 import StringIO
@@ -12,7 +12,7 @@ private_config = ConfigParser.SafeConfigParser()
 private_config.read('private.ini')
 
 workload_types = ['uniform', 'zipfian', 'latest', 'readonly']
-throughputs = [100, 500, 1000, 2500, 5000, 7500, 10000]
+throughputs = [1000, 2500, 5000, 7500, 10000]
 
 local_result_path = config.get('path', 'local_result_path')
 
@@ -32,44 +32,34 @@ default_replication_factor = int(config.get('experiment', 'default_replication_f
 
 def run_experiment(active_cluster_size, throughput, workload_type, num_records, replication_factor):
     print 'Turning off Cassandra...'
-    ret = os.system('pkill -f CassandraDaemon')
-    if ret != 0:
-        raise Exception('Unable to turn off Cassandra')
+    os.system('pkill -f CassandraDaemon')
+
+    # Grace period before Cassandra completely turns off
+    sleep(10)
 
     print 'Cleaning up existing Cassandra\'s data...'
-    ret = os.system('rm -rf %s; mkdir %s %s/data %s/log %s/commitlog %s/saved_caches'
-                    % (cassandra_home, cassandra_home, cassandra_home, cassandra_home, cassandra_home, cassandra_home))
-    if ret != 0:
-        raise Exception('Unable to clean up Cassandra\'s data')
+    os.system('rm -rf %s; mkdir %s %s/data %s/log %s/commitlog %s/saved_caches'
+              % (cassandra_home, cassandra_home, cassandra_home, cassandra_home, cassandra_home, cassandra_home))
 
     output_dir_name = strftime('%m-%d-%H%M')
     output_dir_path = remote_base_path + '/data/' + output_dir_name
 
     # Running Cassandra cluster
     print 'Running Cassandra'
-    ret = os.system('bw-deploy-cassandra-cluster.sh')
-    if ret != 0:
-        raise Exception('Unable to execute Cassandra')
+    os.system('chmod +x bw-deploy-cassandra-cluster.sh')
+    ret = os.system('bw-deploy-cassandra-cluster.sh > /tmp/deploy-cassandra-cluster-log.txt')
+
+    # Grace period before Cassandra completely turns on before executing YCSB
+    sleep(20)
 
     # Running YCSB script
     print 'Running YCSB script'
+    os.system('chmod +x bw-ycsb-script.sh')
     ret = os.system('bw-ycsb-script.sh '
                     '--base_path=%s --throughput=%s --num_records=%d --workload=%s --replication_factor=%d'
                     % (output_dir_path, throughput, num_records, workload_type, replication_factor))
     if ret != 0:
         raise Exception('Unable to finish YCSB script')
-
-    out = subprocess.check_output(('cat %s/execution-output.txt' % output_dir_path), shell=True)
-    buf = StringIO.StringIO(out)
-    result = ycsb_parser.parse_execution_output(buf)
-
-    result['base_directory_name'] = output_dir_name
-    result['workload_type'] = workload_type
-    result['num_records'] = num_records
-    result['throughput'] = throughput
-    result['num_nodes'] = active_cluster_size
-    result['replication_factor'] = replication_factor
-    return result
 
 
 # differ throughputs

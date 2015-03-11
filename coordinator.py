@@ -15,7 +15,7 @@ private_config.read('private.ini')
 tc = TwilioRestClient(private_config.get('twilio', 'account_sid'), private_config.get('twilio', 'auth_token'))
 
 workload_types = ['uniform', 'zipfian', 'latest', 'readonly']
-throughputs = [100, 500, 1000, 2500, 5000, 7500, 10000]
+throughputs = [1000, 2500, 5000, 7500, 10000]
 
 local_result_path = config.get('path', 'local_result_path')
 local_raw_result_path = local_result_path + '/raw'

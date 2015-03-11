@@ -77,7 +77,7 @@ insertproportion=0
 
 requestdistribution=${WORKLOAD}
 
-threadcount=10
+threadcount=30
 
 # For CQL client
 hosts=127.0.0.1
@@ -86,10 +86,15 @@ columnfamily=usertable
 
 histogram.buckets=10000
 
+# number of operations in warmup phase, if zero then don't warmup(default: 0)
+warmupoperationcount=100000
+# execution time of warmup phase in milliseconds, if zero then don't warmup (default: 0)
+warmupexecutiontime=30000
+
 EOF
 
 # Load YCSB Workload
-${YCSB_HOME}/bin/ycsb load cassandra-cql -s -P ${BASE_PATH}/workload.txt
+${YCSB_HOME}/bin/ycsb load cassandra-cql -s -P ${BASE_PATH}/workload.txt > ${BASE_PATH}/load-output.txt
 
 # Execute YCSB Workload
 # -s: report status every 10 seconds to stderr

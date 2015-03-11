@@ -53,7 +53,7 @@ create table ycsb.usertable (
 EOF
 
 # Setup keyspace and column family in Cassandra for YCSB workload
-${CASSANDRA_HOME}/bin/cqlsh --file=/tmp/cql_input.txt
+${CASSANDRA_HOME}/bin/cqlsh --file=/tmp/cql_input.txt node-0
 
 # Download and extract YCSB binary
 if [ ! -f /tmp/ycsb-cassandra.tar.gz ]; then
@@ -83,10 +83,10 @@ insertproportion=0
 
 requestdistribution=${WORKLOAD}
 
-threadcount=10
+threadcount=30
 
 # For CQL client
-hosts=127.0.0.1
+hosts=node-0
 port=9042
 columnfamily=usertable
 
