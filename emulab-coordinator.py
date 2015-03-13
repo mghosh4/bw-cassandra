@@ -58,7 +58,7 @@ def run_experiment(cluster_size, active_cluster_size, throughput, workload_type,
         out = subprocess.check_output(('ssh yossupp@node-0.bw-cassandra.ISS.emulab.net \'cat %s/execution-output.txt\''
                                        % output_dir_path), shell=True)
         buf = StringIO.StringIO(out)
-        result = ycsb_parser.parse_execution_output(buf)
+        result = ycsb_parser.parse_execution_output(str(buf))
 
     finally:
         os.system('ssh yossupp@node-0.bw-cassandra.ISS.emulab.net \'tar -czf %s.tar.gz -C %s %s \''

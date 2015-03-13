@@ -1,4 +1,5 @@
 from unittest import TestCase
+from StringIO import StringIO
 
 import ycsb_parser
 
@@ -17,3 +18,8 @@ class TestYcsbParser(TestCase):
         assert result_dict['update_average_latency'] is not None
 
         print result_dict
+
+    def test_stringio_to_string(self):
+        sio = StringIO('hello world')
+        s = str(sio)
+        print s.__class__
