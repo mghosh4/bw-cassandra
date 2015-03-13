@@ -51,6 +51,7 @@ ycsb_command = ["/u/sciteam/shin1/scratch/jdk1.7.0_65/bin/java", "-cp", os.paths
 # Initialization needed every time logging in to Blue Waters node
 
 1. Set `JAVA_HOME` and `PATH`.
+
     ```bash
 export JAVA_HOME=/u/sciteam/shin1/scratch/jdk1.7.0_65
 export PATH=$PATH:/u/sciteam/shin1/scratch/jdk1.7.0_65
@@ -59,6 +60,7 @@ export PATH=$PATH:/u/sciteam/shin1/scratch/jdk1.7.0_65
 # Running Cassandra
 
  1. Set up directories necessary for running Cassandra. By default, Cassandra saves its data under `/var/lib/cassandra` and log under `var/log/cassandra`. Obviously, we don't have too much access to the CCM node, and thus we should put our data under scratch directory.
+ 
     ```bash
 > /u/sciteam/shin1/scratch/apache-cassandra-2.1.3/bin/cassandra
     ```
@@ -67,6 +69,7 @@ export PATH=$PATH:/u/sciteam/shin1/scratch/jdk1.7.0_65
 # Run YCSB script
 
 1. Before running YCSB workload, you have to initialize the keyspace and the column family specifically required for running YCSB.
+
     ```
 create keyspace ycsb WITH REPLICATION = {'class' : 'SimpleStrategy', 'replication_factor': 1 };
 create table ycsb.usertable (
