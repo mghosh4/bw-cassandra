@@ -1,0 +1,145 @@
+YCSB Client 0.1
+Command line: -db com.yahoo.ycsb.db.CassandraCQLClient -s -target 5000 -P /u/sciteam/shin1/scratch/data/workload.txt -t
+Connected to cluster: Test Cluster
+Connected to cluster: Test Cluster
+Datacenter: datacenter1; Host: /127.0.0.1; Rack: rack1
+Connected to cluster: Test Cluster
+Datacenter: datacenter1; Host: /127.0.0.1; Rack: rack1
+Connected to cluster: Test Cluster
+Connected to cluster: Test Cluster
+Connected to cluster: Test Cluster
+Datacenter: datacenter1; Host: /127.0.0.1; Rack: rack1
+Connected to cluster: Test Cluster
+Datacenter: datacenter1; Host: /127.0.0.1; Rack: rack1
+Connected to cluster: Test Cluster
+Datacenter: datacenter1; Host: /127.0.0.1; Rack: rack1
+Connected to cluster: Test Cluster
+Datacenter: datacenter1; Host: /127.0.0.1; Rack: rack1
+Connected to cluster: Test Cluster
+Datacenter: datacenter1; Host: /127.0.0.1; Rack: rack1
+Datacenter: datacenter1; Host: /127.0.0.1; Rack: rack1
+Datacenter: datacenter1; Host: /127.0.0.1; Rack: rack1
+Datacenter: datacenter1; Host: /127.0.0.1; Rack: rack1
+Warmup execution time: 0
+Warmup operations: 0
+Warmup execution time: 0
+Warmup operations: 0
+Warmup execution time: 0
+Warmup operations: 0
+Warmup execution time: 0
+Warmup execution time: 0
+Warmup execution time: 0
+Warmup operations: 0
+Warmup execution time: 0
+Warmup operations: 0
+Warmup operations: 0
+Warmup execution time: 0
+Warmup operations: 0
+Warmup operations: 0
+Warmup execution time: 0
+Warmup operations: 0
+Warmup execution time: 0
+Warmup operations: 0
+[UPDATE], 0, 14624
+[UPDATE], 1, 126
+[UPDATE], 2, 23
+[UPDATE], 3, 6
+[UPDATE], 4, 5
+[UPDATE], 5, 1
+[UPDATE], 6, 1
+[UPDATE], 7, 3
+[UPDATE], 8, 1
+[UPDATE], 9, 3
+[UPDATE], 10, 1
+[UPDATE], 11, 2
+[UPDATE], 12, 2
+[UPDATE], 16, 1
+[UPDATE], 19, 1
+[UPDATE], 20, 1
+[UPDATE], 28, 1
+[UPDATE], 29, 1
+[UPDATE], 31, 1
+[UPDATE], 32, 1
+[UPDATE], 33, 1
+[UPDATE], 34, 1
+[UPDATE], 35, 1
+[UPDATE], 36, 1
+[UPDATE], 38, 1
+[UPDATE], 48, 1
+[UPDATE], 49, 1
+[UPDATE], 50, 1
+[UPDATE], 54, 1
+[UPDATE], 56, 2
+[UPDATE], 59, 1
+[UPDATE], 107, 1
+[UPDATE], Operations, 14818
+[UPDATE], Retries, 0
+[UPDATE], AverageLatency(us), 331.8173842623836
+[UPDATE], MinLatency(us), 149
+[UPDATE], MaxLatency(us), 107599
+[UPDATE], 95thPercentileLatency(ms), 0
+[UPDATE], 99thPercentileLatency(ms), 1
+[UPDATE], Return=0, 14818
+[READ], 0, 282348
+[READ], 1, 2252
+[READ], 2, 385
+[READ], 3, 44
+[READ], 4, 18
+[READ], 5, 19
+[READ], 6, 4
+[READ], 7, 5
+[READ], 8, 5
+[READ], 9, 6
+[READ], 10, 8
+[READ], 11, 3
+[READ], 12, 3
+[READ], 16, 3
+[READ], 18, 1
+[READ], 19, 5
+[READ], 20, 8
+[READ], 26, 1
+[READ], 27, 3
+[READ], 28, 3
+[READ], 29, 1
+[READ], 30, 1
+[READ], 31, 3
+[READ], 32, 1
+[READ], 33, 3
+[READ], 34, 6
+[READ], 35, 5
+[READ], 36, 5
+[READ], 37, 1
+[READ], 38, 4
+[READ], 39, 3
+[READ], 42, 1
+[READ], 48, 1
+[READ], 50, 1
+[READ], 51, 2
+[READ], 61, 1
+[READ], 107, 6
+[READ], 108, 3
+[READ], 173, 1
+[READ], 176, 1
+[READ], 177, 6
+[READ], 178, 2
+[READ], Operations, 285182
+[READ], Retries, 0
+[READ], AverageLatency(us), 266.8013268719625
+[READ], MinLatency(us), 134
+[READ], MaxLatency(us), 178883
+[READ], 95thPercentileLatency(ms), 0
+[READ], 99thPercentileLatency(ms), 0
+[READ], Return=0, 285182
+[CLEANUP], 0, 10
+[CLEANUP], Operations, 10
+[CLEANUP], Retries, 0
+[CLEANUP], AverageLatency(us), 2.5
+[CLEANUP], MinLatency(us), 1
+[CLEANUP], MaxLatency(us), 15
+[CLEANUP], 95thPercentileLatency(ms), 0
+[CLEANUP], 99thPercentileLatency(ms), 0
+[OVERALL], Reconnections, 0.0
+[OVERALL], RunTime(ms), 60358.0
+[OVERALL], Operations, 300000.0
+[OVERALL], Throughput(ops/sec), 4970.343616422016
+/u/sciteam/shin1/scratch/jdk1.7.0_65/bin/java -cp /home/ubuntu/ycsb/guava-17.0.jar:/u/sciteam/shin1/scratch/YCSB/fabric/conf:/u/sciteam/shin1/scratch/YCSB/cassandra/target/cassandra-binding-0.1.4.jar:/u/sciteam/shin1/scratch/YCSB/cassandra/target/archive-tmp/cassandra-binding-0.1.4.jar:/u/sciteam/shin1/scratch/YCSB/core/target/._core-0.1.4.jar:/u/sciteam/shin1/scratch/YCSB/core/target/core-0.1.4.jar:/u/sciteam/shin1/scratch/YCSB/couchbase-2.0/target/._couchbase-2.0-0.1.4.jar:/u/sciteam/shin1/scratch/YCSB/couchbase-2.0/target/couchbase-2.0-0.1.4.jar:/u/sciteam/shin1/scratch/YCSB/couchbase-2.0/target/archive-tmp/._couchbase-2.0-0.1.4.jar:/u/sciteam/shin1/scratch/YCSB/couchbase-2.0/target/archive-tmp/couchbase-2.0-0.1.4.jar:/u/sciteam/shin1/scratch/YCSB/dynamodb/conf:/u/sciteam/shin1/scratch/YCSB/memcached/target/._memcached-0.1.4.jar:/u/sciteam/shin1/scratch/YCSB/memcached/target/memcached-0.1.4.jar:/u/sciteam/shin1/scratch/YCSB/memcached/target/archive-tmp/._memcached-0.1.4.jar:/u/sciteam/shin1/scratch/YCSB/memcached/target/archive-tmp/memcached-0.1.4.jar:/u/sciteam/shin1/scratch/YCSB/accumulo/src/main/conf:/u/sciteam/shin1/scratch/YCSB/jdbc/src/main/conf:/u/sciteam/shin1/scratch/YCSB/hbase/src/main/conf com.yahoo.ycsb.Client -db com.yahoo.ycsb.db.CassandraCQLClient -s -target 5000 -P /u/sciteam/shin1/scratch/data/workload.txt -t

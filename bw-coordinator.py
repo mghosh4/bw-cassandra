@@ -12,7 +12,7 @@ private_config = ConfigParser.SafeConfigParser()
 private_config.read('private.ini')
 
 workload_types = ['uniform', 'zipfian', 'latest', 'readonly']
-throughputs = [1000, 2500, 5000, 7500, 10000]
+throughputs = [1000, 2500, 5000, 7500, 10000, 15000]
 
 local_result_path = config.get('path', 'local_result_path')
 

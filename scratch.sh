@@ -56,5 +56,8 @@ sh /u/sciteam/shin1/scratch/bw-ycsb-script.sh --base_path=/u/sciteam/shin1/scrat
 # # Execute YCSB workload
 # YCSB/bin/ycsb run cassandra-cql -P YCSB/workloads/workload-cassandra > output-run.txt
 
+tar -cvzf ~/scratch/03-10-2359.tar.gz *
+
+scp -P 8888 result.tar.gz yosub@104.236.110.182:
 
 
