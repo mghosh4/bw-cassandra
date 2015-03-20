@@ -3,6 +3,9 @@
 # ---------- ----------- -----------------------------------------------------
 # 2015-03-20 Yosub       Initial version
 
+NODE_ADDRESS=127.0.0.1
+SEED_ADDRESS=${NODE_ADDRESS}
+
 for i in "$@"
 do
 case $i in
@@ -23,7 +26,7 @@ done
 JAVA_HOME=/projects/sciteam/jsb/shin1/jdk1.7.0_65
 PATH=$PATH:/projects/sciteam/jsb/shin1/jdk1.7.0_65
 
-echo "## Updating cassandra.yaml config file to customize for this host"
+echo "# Updating cassandra.yaml config file to customize for this host"
 bash -c "cat > ${CASSANDRA_PATH}/conf/cassandra.yaml" <<EOF
 
 cluster_name: 'Test Cluster'
@@ -112,13 +115,15 @@ inter_dc_tcp_nodelay: false
 
 EOF
 
+echo "# Updating logback.xml config file"
+
 bash -c "cat > ${CASSANDRA_PATH}/conf/logback.xml" <<EOF
 <configuration scan="true">
   <jmxConfigurator />
   <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${CASSANDRA_HOME}/system.log</file>
+    <file>${CASSANDRA_HOME}/log/system.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-      <fileNamePattern>${CASSANDRA_HOME}/system.log.%i.zip</fileNamePattern>
+      <fileNamePattern>${CASSANDRA_HOME}/log/system.log.%i.zip</fileNamePattern>
       <minIndex>1</minIndex>
       <maxIndex>20</maxIndex>
     </rollingPolicy>
@@ -149,4 +154,5 @@ bash -c "cat > ${CASSANDRA_PATH}/conf/logback.xml" <<EOF
 </configuration>
 EOF
 
+echo "# Running Cassandra"
 ${CASSANDRA_PATH}/bin/cassandra > /dev/null
