@@ -46,8 +46,7 @@ def run_experiment(active_cluster_size, throughput, workload_type, num_records, 
 
     # Running Cassandra cluster
     print 'Running Cassandra'
-    os.system('chmod +x bw-deploy-cassandra-cluster.sh')
-    ret = os.system('bw-deploy-cassandra-cluster.sh --cassandra_path=%s -cassandra_home=%s'
+    ret = os.system('sh bw-deploy-cassandra-cluster.sh --cassandra_path=%s -cassandra_home=%s'
                     ' > /tmp/deploy-cassandra-cluster-log.txt' %
                     (cassandra_path, cassandra_home))
 
@@ -56,8 +55,7 @@ def run_experiment(active_cluster_size, throughput, workload_type, num_records, 
 
     # Running YCSB script
     print 'Running YCSB script'
-    os.system('chmod +x bw-ycsb-script.sh')
-    ret = os.system('bw-ycsb-script.sh '
+    ret = os.system('sh bw-ycsb-script.sh '
                     '--base_path=%s --throughput=%s --num_records=%d --workload=%s --replication_factor=%d'
                     % (output_dir_path, throughput, num_records, workload_type, replication_factor))
     if ret != 0:

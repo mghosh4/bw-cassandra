@@ -24,7 +24,7 @@ JAVA_HOME=/projects/sciteam/jsb/shin1/jdk1.7.0_65
 PATH=$PATH:/projects/sciteam/jsb/shin1/jdk1.7.0_65
 
 echo "## Updating cassandra.yaml config file to customize for this host"
-sudo bash -c "cat > ${CASSANDRA_PATH}/conf/cassandra.yaml" <<EOF
+bash -c "cat > ${CASSANDRA_PATH}/conf/cassandra.yaml" <<EOF
 
 cluster_name: 'Test Cluster'
 num_tokens: 256
@@ -112,7 +112,7 @@ inter_dc_tcp_nodelay: false
 
 EOF
 
-sudo bash -c "cat > ${CASSANDRA_PATH}/conf/logback.xml" <<EOF
+bash -c "cat > ${CASSANDRA_PATH}/conf/logback.xml" <<EOF
 <configuration scan="true">
   <jmxConfigurator />
   <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
