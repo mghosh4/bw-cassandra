@@ -12,7 +12,7 @@ private_config = ConfigParser.SafeConfigParser()
 private_config.read('private.ini')
 
 workload_types = ['uniform', 'zipfian', 'latest', 'readonly']
-throughputs = [1000, 2500, 5000, 7500, 10000, 15000]
+throughputs = [10000, 20000, 30000, 40000, 50000]
 
 local_result_path = config.get('path', 'local_result_path')
 
@@ -37,11 +37,11 @@ def run_experiment(active_cluster_size, throughput, workload_type, num_records, 
 
     for line in out.splitlines():
         if 'apache-cassandra' in line:
-            pid = int(line.split(None, 1)[1])
+            pid = int(line.split()[1])
             os.kill(pid, 9)
 
     # Grace period before Cassandra completely turns off
-    sleep(10)
+    sleep(5)
 
     print 'Cleaning up existing Cassandra\'s data...'
     os.system('rm -rf %s; mkdir %s %s/data %s/log %s/commitlog %s/saved_caches'
