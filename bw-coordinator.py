@@ -32,7 +32,13 @@ default_replication_factor = int(config.get('experiment', 'default_replication_f
 
 def run_experiment(active_cluster_size, throughput, workload_type, num_records, replication_factor):
     print 'Turning off Cassandra...'
-    os.system('pkill -f CassandraDaemon')
+    p = subprocess.Popen(['ps', 'aux'], stdout=subprocess.PIPE)
+    out, err = p.communicate()
+
+    for line in out.splitlines():
+        if 'apache-cassandra' in line:
+            pid = int(line.split(None, 1)[1])
+            os.kill(pid, 9)
 
     # Grace period before Cassandra completely turns off
     sleep(10)
