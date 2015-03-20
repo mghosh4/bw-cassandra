@@ -21,7 +21,7 @@ local_processed_result_path = local_result_path + '/processed'
 
 remote_base_path = config.get('path', 'remote_base_path')
 cassandra_path = remote_base_path + '/apache-cassandra-2.1.3'
-cassandra_home = remote_base_path + '/cassandra_home'
+cassandra_home = '/tmp' + '/cassandra_home'
 ycsb_home = remote_base_path + '/YCSB'
 
 default_active_cluster_size = int(config.get('experiment', 'default_active_cluster_size'))
