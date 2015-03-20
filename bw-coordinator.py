@@ -46,8 +46,7 @@ def run_experiment(active_cluster_size, throughput, workload_type, num_records, 
 
     # Running Cassandra cluster
     print 'Running Cassandra'
-    ret = os.system('sh bw-deploy-cassandra-cluster.sh --cassandra_path=%s -cassandra_home=%s'
-                    ' > /tmp/deploy-cassandra-cluster-log.txt' %
+    ret = os.system('sh bw-deploy-cassandra-cluster.sh --cassandra_path=%s --cassandra_home=%s' %
                     (cassandra_path, cassandra_home))
 
     # Grace period before Cassandra completely turns on before executing YCSB
