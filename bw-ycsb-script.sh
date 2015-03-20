@@ -3,9 +3,9 @@
 # ---------- ----------- -----------------------------------------------------
 # 2015-03-07 Yosub Shin  Initial Version
 
-CASSANDRA_HOME=/u/sciteam/shin1/scratch/apache-cassandra-2.1.3
+CASSANDRA_PATH=/projects/sciteam/jsb/shin1/apache-cassandra-2.1.3
 YOSUB_PERSONAL_HOST=http://104.236.110.182
-YCSB_HOME=/u/sciteam/shin1/scratch/YCSB
+YCSB_HOME=/projects/sciteam/jsb/shin1/YCSB
 
 for i in "$@"
 do
@@ -53,7 +53,7 @@ create table ycsb.usertable (
 EOF
 
 # Setup keyspace and column family in Cassandra for YCSB workload
-${CASSANDRA_HOME}/bin/cqlsh --file=/tmp/cql_input.txt
+${CASSANDRA_PATH}/bin/cqlsh --file=/tmp/cql_input.txt
 
 # Create output directory if not exists
 if [ ! -f ${BASE_PATH} ]; then
