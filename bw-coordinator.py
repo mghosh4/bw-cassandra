@@ -21,7 +21,6 @@ local_processed_result_path = local_result_path + '/processed'
 
 remote_base_path = config.get('path', 'remote_base_path')
 cassandra_path = remote_base_path + '/apache-cassandra-2.1.3'
-cassandra_home = '/tmp' + '/cassandra_home'
 ycsb_home = remote_base_path + '/YCSB'
 
 default_active_cluster_size = int(config.get('experiment', 'default_active_cluster_size'))
@@ -30,33 +29,23 @@ default_workload_type = config.get('experiment', 'default_workload_type')
 default_replication_factor = int(config.get('experiment', 'default_replication_factor'))
 
 
-def run_experiment(active_cluster_size, throughput, workload_type, num_records, replication_factor):
-    print 'Turning off Cassandra...'
-    p = subprocess.Popen(['ps', 'aux'], stdout=subprocess.PIPE)
-    out, err = p.communicate()
-
-    for line in out.splitlines():
-        if 'apache-cassandra' in line:
-            pid = int(line.split()[1])
-            os.kill(pid, 9)
-
-    # Grace period before Cassandra completely turns off
-    sleep(5)
-
-    print 'Cleaning up existing Cassandra\'s data...'
-    os.system('rm -rf %s; mkdir %s %s/data %s/log %s/commitlog %s/saved_caches'
-              % (cassandra_home, cassandra_home, cassandra_home, cassandra_home, cassandra_home, cassandra_home))
-
-    output_dir_name = strftime('%m-%d-%H%M')
-    output_dir_path = remote_base_path + '/data/' + output_dir_name
-
-    # Running Cassandra cluster
-    print 'Running Cassandra'
-    ret = os.system('sh bw-deploy-cassandra-cluster.sh --cassandra_path=%s --cassandra_home=%s' %
-                    (cassandra_path, cassandra_home))
+def run_experiment(hosts, throughput, workload_type, num_records, replication_factor):
+    seed_host = hosts[0]
+    my_host = 'TBD'
+    # Kill, cleanup, make directories, and run cassandra
+    for host in hosts:
+        # Coordinator does not participate in Cassandra cluster
+        if host is not my_host:
+            cassandra_home = '/tmp/cassandra-home-%s' % host
+            ret = os.system('sh bw-deploy-cassandra-cluster.sh --cassandra_path=%s --cassandra_home=%s '
+                            '--seed_host=%s --dst_host=%s' %
+                            (cassandra_path, cassandra_home, seed_host, host))
 
     # Grace period before Cassandra completely turns on before executing YCSB
     sleep(20)
+
+    output_dir_name = strftime('%m-%d-%H%M')
+    output_dir_path = remote_base_path + '/data/' + output_dir_name
 
     # Running YCSB script
     print 'Running YCSB script'
@@ -68,21 +57,33 @@ def run_experiment(active_cluster_size, throughput, workload_type, num_records, 
 
 
 # differ throughputs
-def experiment_on_throughput(csv_file_name, repeat):
+def experiment_on_throughput(repeat):
     for run in range(repeat):
         for throughput in throughputs:
-            result = run_experiment(active_cluster_size=default_active_cluster_size,
+            result = run_experiment(hosts=get_hosts(),
                                     throughput=throughput,
                                     num_records=default_num_records,
                                     workload_type=default_workload_type,
                                     replication_factor=default_replication_factor)
 
 
+def get_hosts():
+    hosts = set()
+    for fn in os.listdir('/u/sciteam/shin1/.crayccm/'):
+        f = open('/u/sciteam/shin1/.crayccm/%s' % fn)
+        lines = f.read().splitlines()
+        for line in lines:
+            host = int(line)
+            if host not in hosts:
+                hosts.add(host)
+        break  # Break after first file
+    return hosts
+
+
 def main():
-    csv_file_name = '%s/%s.csv' % (local_processed_result_path, strftime('%m-%d-%H%M'))
     repeat = int(config.get('experiment', 'repeat'))
 
-    experiment_on_throughput(csv_file_name, repeat)
+    experiment_on_throughput(repeat)
 
 
 if __name__ == "__main__":
