@@ -35,6 +35,7 @@ def run_experiment(neighbor_hosts, throughput, workload_type, num_records, repli
         ret = os.system('sh bw-deploy-cassandra-cluster.sh --cassandra_path=%s --cassandra_home=%s '
                         '--seed_host=%s --dst_host=%s' %
                         (cassandra_path, cassandra_home, seed_host, host))
+        sleep(10)
 
     # Grace period before Cassandra completely turns on before executing YCSB
     sleep(20)
@@ -45,8 +46,10 @@ def run_experiment(neighbor_hosts, throughput, workload_type, num_records, repli
     # Running YCSB script
     print 'Running YCSB script'
     ret = os.system('sh bw-ycsb-script.sh '
-                    '--base_path=%s --throughput=%s --num_records=%d --workload=%s --replication_factor=%d'
-                    % (output_dir_path, throughput, num_records, workload_type, replication_factor))
+                    '--base_path=%s --throughput=%s --num_records=%d --workload=%s '
+                    '--replication_factor=%d --seed_host=%s --neighbor_hosts=%s'
+                    % (output_dir_path, throughput, num_records, workload_type,
+                       replication_factor, seed_host, neighbor_hosts.join(',')))
     if ret != 0:
         raise Exception('Unable to finish YCSB script')
 

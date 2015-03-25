@@ -30,6 +30,14 @@ case $i in
     REPLICATION_FACTOR="${i#*=}"
     shift
     ;;
+    --seed_host=*)
+    SEED_HOST="${i#*=}"
+    shift
+    ;;
+    --neighbor_hosts=*)
+    NEIGHBOR_HOSTS="${i#*=}"
+    shift
+    ;;
     *)
             # unknown option
     ;;
@@ -53,7 +61,7 @@ create table ycsb.usertable (
 EOF
 
 # Setup keyspace and column family in Cassandra for YCSB workload
-${CASSANDRA_PATH}/bin/cqlsh --file=/tmp/cql_input.txt
+${CASSANDRA_PATH}/bin/cqlsh --file=/tmp/cql_input.txt ${SEED_HOST}
 
 # Create output directory if not exists
 if [ ! -f ${BASE_PATH} ]; then
@@ -80,7 +88,7 @@ requestdistribution=${WORKLOAD}
 threadcount=30
 
 # For CQL client
-hosts=127.0.0.1
+hosts=${NEIGHBOR_HOSTS}
 port=9042
 columnfamily=usertable
 
