@@ -1,9 +1,6 @@
 import os
 from time import strftime, sleep
-import subprocess
 import ConfigParser
-import StringIO
-import ycsb_parser
 import socket
 
 config = ConfigParser.SafeConfigParser()
@@ -30,17 +27,14 @@ default_workload_type = config.get('experiment', 'default_workload_type')
 default_replication_factor = int(config.get('experiment', 'default_replication_factor'))
 
 
-def run_experiment(hosts, throughput, workload_type, num_records, replication_factor):
-    seed_host = hosts[0]
-    my_host = socket.gethostname()
+def run_experiment(neighbor_hosts, throughput, workload_type, num_records, replication_factor):
+    seed_host = neighbor_hosts[0]
     # Kill, cleanup, make directories, and run cassandra
-    for host in hosts:
-        # Coordinator does not participate in Cassandra cluster
-        if host is not my_host:
-            cassandra_home = '/tmp/cassandra-home-%s' % host
-            ret = os.system('sh bw-deploy-cassandra-cluster.sh --cassandra_path=%s --cassandra_home=%s '
-                            '--seed_host=%s --dst_host=%s' %
-                            (cassandra_path, cassandra_home, seed_host, host))
+    for host in neighbor_hosts:
+        cassandra_home = '/tmp/cassandra-home-%s' % host
+        ret = os.system('sh bw-deploy-cassandra-cluster.sh --cassandra_path=%s --cassandra_home=%s '
+                        '--seed_host=%s --dst_host=%s' %
+                        (cassandra_path, cassandra_home, seed_host, host))
 
     # Grace period before Cassandra completely turns on before executing YCSB
     sleep(20)
@@ -61,24 +55,27 @@ def run_experiment(hosts, throughput, workload_type, num_records, replication_fa
 def experiment_on_throughput(repeat):
     for run in range(repeat):
         for throughput in throughputs:
-            result = run_experiment(hosts=get_hosts(),
+            result = run_experiment(neighbor_hosts=get_neighbor_hosts(),
                                     throughput=throughput,
                                     num_records=default_num_records,
                                     workload_type=default_workload_type,
                                     replication_factor=default_replication_factor)
 
 
-def get_hosts():
+# Get host names in .crayccm file other than myself
+def get_neighbor_hosts():
     hosts = set()
+    my_host = socket.gethostname()
     for fn in os.listdir('/u/sciteam/shin1/.crayccm/'):
         f = open('/u/sciteam/shin1/.crayccm/%s' % fn)
         lines = f.read().splitlines()
         for line in lines:
             host = line
-            if host not in hosts:
+            # Coordinator does not participate in Cassandra cluster
+            if host not in hosts and host is not my_host:
                 hosts.add(host)
         break  # Break after first file
-    return hosts
+    return list(hosts)
 
 
 def main():
