@@ -4,6 +4,7 @@ import subprocess
 import ConfigParser
 import StringIO
 import ycsb_parser
+import socket
 
 config = ConfigParser.SafeConfigParser()
 config.read('bw-config.ini')
@@ -31,7 +32,7 @@ default_replication_factor = int(config.get('experiment', 'default_replication_f
 
 def run_experiment(hosts, throughput, workload_type, num_records, replication_factor):
     seed_host = hosts[0]
-    my_host = 'TBD'
+    my_host = socket.gethostname()
     # Kill, cleanup, make directories, and run cassandra
     for host in hosts:
         # Coordinator does not participate in Cassandra cluster
@@ -73,7 +74,7 @@ def get_hosts():
         f = open('/u/sciteam/shin1/.crayccm/%s' % fn)
         lines = f.read().splitlines()
         for line in lines:
-            host = int(line)
+            host = line
             if host not in hosts:
                 hosts.add(host)
         break  # Break after first file
