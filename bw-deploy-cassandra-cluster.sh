@@ -41,7 +41,7 @@ PATH=\$PATH:/projects/sciteam/jsb/shin1/jdk1.7.0_65
 echo "# Killing cassandra at host ${DST_HOST}..."
 kill \$(ps aux | grep cassandra | grep -v grep | awk '{print \$2}')
 
-sleep 10
+sleep 5
 
 echo "# Cleaning up cassandra..."
 rm -rf ${CASSANDRA_HOME}

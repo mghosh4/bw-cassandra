@@ -85,7 +85,7 @@ insertproportion=0
 
 requestdistribution=${WORKLOAD}
 
-threadcount=20
+threadcount=100
 
 # For CQL client
 hosts=${NEIGHBOR_HOSTS}
