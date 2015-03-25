@@ -176,6 +176,6 @@ bash -c "cat > ${CASSANDRA_PATH}/conf/logback.xml" <<-EOF
 EOF
 
 echo "# Running Cassandra"
-${CASSANDRA_PATH}/bin/cassandra
+${CASSANDRA_PATH}/bin/cassandra > /dev/null
 
 EOF2
