@@ -76,9 +76,10 @@ def get_neighbor_hosts():
         for line in lines:
             host = line
             # Coordinator does not participate in Cassandra cluster
-            if host not in hosts and host is not my_host:
+            if host not in hosts:
                 hosts.add(host)
         break  # Break after first file
+    hosts.remove(my_host)
     return list(hosts)
 
 
