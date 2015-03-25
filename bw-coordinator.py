@@ -30,6 +30,7 @@ default_replication_factor = int(config.get('experiment', 'default_replication_f
 def run_experiment(neighbor_hosts, throughput, workload_type, num_records, replication_factor):
     seed_host = neighbor_hosts[0]
     # Kill, cleanup, make directories, and run cassandra
+    print "my host:%s\nneighbors:%s" % (socket.gethostname(), neighbor_hosts)
     for host in neighbor_hosts:
         cassandra_home = '/tmp/cassandra-home-%s' % host
         ret = os.system('sh bw-deploy-cassandra-cluster.sh --cassandra_path=%s --cassandra_home=%s '
@@ -49,7 +50,7 @@ def run_experiment(neighbor_hosts, throughput, workload_type, num_records, repli
                     '--base_path=%s --throughput=%s --num_records=%d --workload=%s '
                     '--replication_factor=%d --seed_host=%s --neighbor_hosts=%s'
                     % (output_dir_path, throughput, num_records, workload_type,
-                       replication_factor, seed_host, neighbor_hosts.join(',')))
+                       replication_factor, seed_host, ','.join(neighbor_hosts)))
     if ret != 0:
         raise Exception('Unable to finish YCSB script')
 
