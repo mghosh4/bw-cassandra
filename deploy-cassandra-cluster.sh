@@ -36,7 +36,7 @@ case $i in
 esac
 done
 
-if [ ${PROFILE} == "emulab" ]; then
+if [ "emulab" = "$PROFILE" ]; then
 SUDO=sudo
 fi
 
@@ -49,10 +49,10 @@ cat <<EOF2 | ssh -t ${DST_HOST} ${SUDO} /bin/bash
 JAVA_HOME=${JAVA_PATH}
 PATH=\$PATH:${JAVA_PATH}
 
-echo "# Killing cassandra at host ${DST_HOST}..."
-kill \$(ps aux | grep cassandra | grep -v grep | grep java | awk '{print \$2}')
+#echo "# Killing cassandra at host ${DST_HOST}..."
+#kill \$(ps aux | grep cassandra | grep -v grep | grep java | awk '{print \$2}')
 
-sleep 5
+#sleep 5
 
 echo "# Cleaning up cassandra..."
 rm -rf ${CASSANDRA_HOME}

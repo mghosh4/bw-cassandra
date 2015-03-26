@@ -45,6 +45,10 @@ def run_experiment(pf, hosts, throughput, workload_type, num_records, replicatio
     java_path = pf.config.get('path', 'java_path')
     result_base_path = pf.config.get('path', 'result_base_path')
 
+    # Kill cassandra on all hosts
+    for host in hosts:
+        os.system('ssh %s kill $(ps aux | grep cassandra | grep -v grep | grep java | awk \'{print $2}\')' % host)
+
     seed_host = hosts[0]
     # Kill, cleanup, make directories, and run cassandra
     for host in hosts:
@@ -52,7 +56,7 @@ def run_experiment(pf, hosts, throughput, workload_type, num_records, replicatio
         ret = os.system('sh deploy-cassandra-cluster.sh --orig_cassandra_path=%s --cassandra_home=%s '
                         '--seed_host=%s --dst_host=%s --java_path=%s --profile=%s' %
                         (cassandra_path, cassandra_home, seed_host, host, java_path, pf.get_name()))
-        sleep(10)
+        sleep(30)
 
     # Grace period before Cassandra completely turns on before executing YCSB
     sleep(20)
@@ -63,7 +67,7 @@ def run_experiment(pf, hosts, throughput, workload_type, num_records, replicatio
     # Running YCSB load script
     print 'Running YCSB load script'
     ret = os.system('sh load-ycsb.sh '
-                    '--cassandra_path=%s --ycsb-path=%s '
+                    '--cassandra_path=%s --ycsb_path=%s '
                     '--base_path=%s --throughput=%s --num_records=%d --workload=%s '
                     '--replication_factor=%d --seed_host=%s --hosts=%s'
                     % (cassandra_path, ycsb_path, result_path, throughput, num_records, workload_type,
