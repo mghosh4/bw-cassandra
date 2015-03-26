@@ -28,7 +28,7 @@ class YcsbExecuteThread(Thread):
 
     def run(self):
         print 'Running YCSB executor thread at host %s' % self.host
-        ycsb_path = pf.config.get('path', 'ycsb_path')
+        ycsb_path = self.pf.config.get('path', 'ycsb_path')
         ret = os.system('ssh %s \'%s/bin/ycsb run cassandra-cql -s -target %s -P %s/workload.txt '
                         '> %s/execution-output-%s.txt\'' % (self.host, ycsb_path, self.throughput,
                                                             self.result_path, self.result_path, self.host))
