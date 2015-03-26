@@ -3,12 +3,13 @@
 # ---------- ----------- -----------------------------------------------------
 # 2015-03-20 Yosub       Initial version
 
-NODE_ADDRESS=127.0.0.1
-SEED_ADDRESS=${NODE_ADDRESS}
-
 for i in "$@"
 do
 case $i in
+    --java_home=*)
+    JAVA_HOME="${i#*=}"
+    shift
+    ;;
     --cassandra_path=*)
     CASSANDRA_PATH="${i#*=}"
     shift
@@ -35,11 +36,11 @@ done
 ssh ${DST_HOST} <<EOF2
 #!/bin/bash
 
-JAVA_HOME=/projects/sciteam/jsb/shin1/jdk1.7.0_65
-PATH=\$PATH:/projects/sciteam/jsb/shin1/jdk1.7.0_65
+JAVA_HOME=${JAVA_HOME}
+PATH=\$PATH:${JAVA_HOME}
 
 echo "# Killing cassandra at host ${DST_HOST}..."
-kill \$(ps aux | grep cassandra | grep -v grep | awk '{print \$2}')
+kill \$(ps aux | grep cassandra | grep -v grep | grep java | awk '{print \$2}')
 
 sleep 5
 

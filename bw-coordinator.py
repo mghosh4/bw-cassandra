@@ -10,7 +10,7 @@ private_config = ConfigParser.SafeConfigParser()
 private_config.read('private.ini')
 
 workload_types = ['uniform', 'zipfian', 'latest', 'readonly']
-throughputs = [10000, 50000, 100000, 150000, 200000]
+throughputs = [50000, 100000, 150000, 200000, 250000]
 
 local_result_path = config.get('path', 'local_result_path')
 
@@ -85,8 +85,18 @@ def get_neighbor_hosts():
 
 def main():
     repeat = int(config.get('experiment', 'repeat'))
+    # Cleanup existing data directory and create a new one
+    data_file_name = strftime('%m-%d-%H%M') + '.tar.gz'
+    os.system('rm -rf %s/data/*; mkdir %s/data' % (remote_base_path, remote_base_path))
 
+    # Do all experiments here
     experiment_on_throughput(repeat)
+
+    # Archive the result and send to remote server
+    os.system('tar -czf %s -C %s %s'
+              % (data_file_name, remote_base_path, 'data'))
+    os.system('scp -P8888 -i %s/sshuser_key %s/%s sshuser@104.236.110.182:bw/'
+              % (remote_base_path, remote_base_path, data_file_name))
 
 
 if __name__ == "__main__":

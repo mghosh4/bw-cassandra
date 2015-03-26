@@ -3,13 +3,17 @@
 # ---------- ----------- -----------------------------------------------------
 # 2015-03-07 Yosub Shin  Initial Version
 
-CASSANDRA_PATH=/projects/sciteam/jsb/shin1/apache-cassandra-2.1.3
-YOSUB_PERSONAL_HOST=http://104.236.110.182
-YCSB_HOME=/projects/sciteam/jsb/shin1/YCSB
-
 for i in "$@"
 do
 case $i in
+    --cassandra_path=*)
+    CASSANDRA_PATH="${i#*=}"
+    shift
+    ;;
+    --ycsb_path=*)
+    YCSB_PATH="${i#*=}"
+    shift
+    ;;
     --base_path=*)
     BASE_PATH="${i#*=}"
     shift
@@ -34,8 +38,8 @@ case $i in
     SEED_HOST="${i#*=}"
     shift
     ;;
-    --hosts=*)
-    HOSTS="${i#*=}"
+    --neighbor_hosts=*)
+    NEIGHBOR_HOSTS="${i#*=}"
     shift
     ;;
     *)
@@ -85,10 +89,10 @@ insertproportion=0
 
 requestdistribution=${WORKLOAD}
 
-threadcount=50
+threadcount=30
 
 # For CQL client
-hosts=${HOSTS}
+hosts=${NEIGHBOR_HOSTS}
 port=9042
 columnfamily=usertable
 
@@ -102,10 +106,4 @@ warmupexecutiontime=30000
 EOF
 
 # Load YCSB Workload
-${YCSB_HOME}/bin/ycsb load cassandra-cql -s -P ${BASE_PATH}/workload.txt > ${BASE_PATH}/load-output.txt
-
-# Execute YCSB Workload
-# -s: report status every 10 seconds to stderr
-# -target: throughput(ops/s)
-# -P: workload file
-${YCSB_HOME}/bin/ycsb run cassandra-cql -s -target ${THROUGHPUT} -P ${BASE_PATH}/workload.txt > ${BASE_PATH}/execution-output.txt
+${YCSB_PATH}/bin/ycsb load cassandra-cql -s -P ${BASE_PATH}/workload.txt > ${BASE_PATH}/load-output.txt

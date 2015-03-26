@@ -2,8 +2,9 @@
 
 1. SSH into Blue Waters system with `ssh <id>@bw.ncsa.illinois.edu`. Upon prompted for password, type the ordinary password followed by OTP generated password.
 
-2. Request CCM(Cluster Compatibility Mode) node for x amount of time(hh:mm:ss)
+2. Request CCM(Cluster Compatibility Mode) node for desired amount of time(hh:mm:ss)
     ```bash
+    > # qsub -I -l gres=ccm -l nodes=<# of nodes>:ppn=<# of virtual cores per node;16 or 32>:<type of node; xk or xe> -l walltime=01:00:00
     > qsub -I -l gres=ccm -l nodes=1:ppn=16:xk -l walltime=01:00:00
     ```
 
@@ -19,6 +20,12 @@ nid16024   <- This is what output should look like
     ```
 
 5. At this point, you should be logged into the Blue Water's CCM node. You can use regular Linux commands here and do computations
+
+6. Or you can run script with `ccmrun` command to enable larger file number limits as following.
+    ```bash
+    > module add ccm
+    > APRUN_XFER_LIMITS=1 ccmrun sh bw-ccmrun.sh
+    ```
 
 # Initialization of Blue Waters node for the first time
 
