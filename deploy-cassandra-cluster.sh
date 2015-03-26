@@ -26,15 +26,25 @@ case $i in
     SEED_HOST="${i#*=}"
     shift
     ;;
+    --profile=*)
+    PROFILE="${i#*=}"
+    shift
+    ;;
     *)
             # unknown option
     ;;
 esac
 done
 
+if [ ${PROFILE} == "emulab" ]; then
+SUDO=sudo
+fi
+
 # Inside heredoc, \$'s delimited with \\ is not expanded locally and will be executed in remote machine
-ssh ${DST_HOST} <<EOF2
-#!/bin/bash
+#ssh ${DST_HOST} <<EOF2
+##!/bin/bash
+
+cat <<EOF2 | ssh -t ${DST_HOST} ${SUDO} /bin/bash
 
 JAVA_HOME=${JAVA_PATH}
 PATH=\$PATH:${JAVA_PATH}

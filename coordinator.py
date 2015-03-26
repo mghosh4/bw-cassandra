@@ -104,25 +104,25 @@ def experiment_on_throughput(pf):
 
 
 def main():
-    profile_name = sys.argv[0]
-    if profile_name is 'bw':
+    profile_name = sys.argv[1]
+    if profile_name == 'bw':
         pf = profile.BlueWatersProfile()
-    elif profile_name is 'emulab':
+    elif profile_name == 'emulab':
         pf = profile.EmulabProfile()
     else:
         raise Exception('Specify which profile to use...')
 
     # Cleanup existing result directory and create a new one
     result_file_name = strftime('%m-%d-%H%M') + '.tar.gz'
-    result_path = pf.config.get('path', 'result_path')
-    os.system('rm -rf %s;mkdir %s' % (result_path, result_path))
+    result_base_path = pf.config.get('path', 'result_base_path')
+    os.system('rm -rf %s;mkdir %s' % (result_base_path, result_base_path))
 
     # Do all experiments here
     experiment_on_throughput(pf)
 
     # Archive the result and send to remote server
     os.system('tar -czf /tmp/%s %s'
-              % (result_file_name, result_path))
+              % (result_file_name, result_base_path))
     private_key_path = pf.config.get('path', 'priate_key_path')
     os.system('scp -P8888 -i %s/sshuser_key /tmp/%s sshuser@104.236.110.182:bw/'
               % (private_key_path, result_file_name))
