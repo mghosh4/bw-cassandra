@@ -1,4 +1,5 @@
 import ConfigParser
+import os
 
 __author__ = 'Daniel'
 

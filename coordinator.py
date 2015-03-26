@@ -13,18 +13,15 @@ private_config.read('private.ini')
 workload_types = ['uniform', 'zipfian', 'latest', 'readonly']
 
 
-threads = []
-output = []
-mutex = thread.allocate_lock()
-
-
 class YcsbExecuteThread(Thread):
-    def __init__(self, pf, host, throughput, result_path):
+    def __init__(self, pf, host, throughput, result_path, output, mutex):
         Thread.__init__(self)
         self.pf = pf
         self.host = host
         self.throughput = throughput
         self.result_path = result_path
+        self.output = output
+        self.mutex = mutex
 
     def run(self):
         print 'Running YCSB executor thread at host %s' % self.host
@@ -32,9 +29,9 @@ class YcsbExecuteThread(Thread):
         ret = os.system('ssh %s \'%s/bin/ycsb run cassandra-cql -s -target %s -P %s/workload.txt '
                         '> %s/execution-output-%s.txt\'' % (self.host, ycsb_path, self.throughput,
                                                             self.result_path, self.result_path, self.host))
-        mutex.acquire()
-        output.append(ret)
-        mutex.release()
+        self.mutex.acquire()
+        self.output.append(ret)
+        self.mutex.release()
         print 'Finished running YCSB executor thread at host %s' % self.host
 
 
@@ -80,10 +77,14 @@ def run_experiment(pf, hosts, throughput, workload_type, num_records, replicatio
     if ret != 0:
         raise Exception('Unable to finish YCSB script')
 
+    threads = []
+    output = []
+    mutex = thread.allocate_lock()
+
     # Run YCSB executor threads in parallel at each host
     print 'Running YCSB execute workload at each host in parallel...'
     for host in hosts:
-        current_thread = YcsbExecuteThread(pf, host, throughput, result_path)
+        current_thread = YcsbExecuteThread(pf, host, throughput, result_path, output, mutex)
         threads.append(current_thread)
         current_thread.start()
 
@@ -130,11 +131,11 @@ def main():
     experiment_on_throughput(pf)
 
     # Archive the result and send to remote server
-    os.system('tar -czf /tmp/%s %s'
+    os.system('tar -czf /tmp/%s -C %s/.. result'
               % (result_file_name, result_base_path))
-    private_key_path = pf.config.get('path', 'priate_key_path')
-    os.system('scp -P8888 -i %s/sshuser_key /tmp/%s sshuser@104.236.110.182:bw/'
-              % (private_key_path, result_file_name))
+    private_key_path = pf.config.get('path', 'private_key_path')
+    os.system('scp -P8888 -i %s/sshuser_key /tmp/%s sshuser@104.236.110.182:%s/'
+              % (private_key_path, result_file_name, pf.get_name()))
     os.system('rm /tmp/%s' % result_file_name)
 
 if __name__ == "__main__":

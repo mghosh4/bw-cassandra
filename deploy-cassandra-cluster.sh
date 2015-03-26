@@ -56,6 +56,8 @@ PATH=\$PATH:${JAVA_PATH}
 
 echo "# Cleaning up cassandra..."
 rm -rf ${CASSANDRA_HOME}
+
+echo "# Making a new Cassandra directory and copying Cassandra binary..."
 mkdir ${CASSANDRA_HOME} ${CASSANDRA_HOME}/data ${CASSANDRA_HOME}/log ${CASSANDRA_HOME}/commitlog ${CASSANDRA_HOME}/saved_caches
 cp -r ${ORIG_CASSANDRA_PATH} ${CASSANDRA_HOME}/cassandra
 
