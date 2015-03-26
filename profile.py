@@ -27,6 +27,9 @@ class BlueWatersProfile(BaseProfile):
             break  # Break after first file
         return list(hosts)
 
+    def get_name(self):
+        return 'bw'
+
 
 class EmulabProfile(BaseProfile):
     def __init__(self):
@@ -47,3 +50,6 @@ class EmulabProfile(BaseProfile):
                 host = tokens[3]
                 hosts.add(host)
         return list(hosts)
+
+    def get_name(self):
+        return 'emulab'

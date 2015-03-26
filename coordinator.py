@@ -50,8 +50,8 @@ def run_experiment(pf, hosts, throughput, workload_type, num_records, replicatio
     for host in hosts:
         cassandra_home = '%s/%s' % (cassandra_home_base_path, host)
         ret = os.system('sh deploy-cassandra-cluster.sh --orig_cassandra_path=%s --cassandra_home=%s '
-                        '--seed_host=%s --dst_host=%s --java_path=%s' %
-                        (cassandra_path, cassandra_home, seed_host, host, java_path))
+                        '--seed_host=%s --dst_host=%s --java_path=%s --profile=%s' %
+                        (cassandra_path, cassandra_home, seed_host, host, java_path, pf.get_name()))
         sleep(10)
 
     # Grace period before Cassandra completely turns on before executing YCSB
