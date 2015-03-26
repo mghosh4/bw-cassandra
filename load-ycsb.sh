@@ -38,8 +38,8 @@ case $i in
     SEED_HOST="${i#*=}"
     shift
     ;;
-    --neighbor_hosts=*)
-    NEIGHBOR_HOSTS="${i#*=}"
+    --hosts=*)
+    HOSTS="${i#*=}"
     shift
     ;;
     *)
@@ -92,7 +92,7 @@ requestdistribution=${WORKLOAD}
 threadcount=30
 
 # For CQL client
-hosts=${NEIGHBOR_HOSTS}
+hosts=${HOSTS}
 port=9042
 columnfamily=usertable
 

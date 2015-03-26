@@ -49,7 +49,7 @@ def run_experiment(pf, hosts, throughput, workload_type, num_records, replicatio
     for host in hosts:
         print 'Killing Casandra at host %s' % host
         sudo = 'sudo' if pf.get_name() == 'emulab' else ''
-        os.system('ssh %s ps aux | grep cassandra | grep -v grep | grep java | awk \'{print $2}\' | xargs %s kill' % (host, sudo))
+        os.system('ssh %s ps aux | grep cassandra | grep -v grep | grep java | awk \'{print $2}\' | xargs %s kill -9' % (host, sudo))
 
     seed_host = hosts[0]
     # Kill, cleanup, make directories, and run cassandra
@@ -64,7 +64,7 @@ def run_experiment(pf, hosts, throughput, workload_type, num_records, replicatio
     sleep(20)
 
     result_dir_name = strftime('%m-%d-%H%M')
-    result_path = result_base_path + result_dir_name
+    result_path = '%s/%s' % (result_base_path, result_dir_name)
 
     # Running YCSB load script
     print 'Running YCSB load script'
