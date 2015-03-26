@@ -47,7 +47,9 @@ def run_experiment(pf, hosts, throughput, workload_type, num_records, replicatio
 
     # Kill cassandra on all hosts
     for host in hosts:
-        os.system('ssh %s kill $(ps aux | grep cassandra | grep -v grep | grep java | awk \'{print $2}\')' % host)
+        print 'Killing Casandra at host %s' % host
+        sudo = 'sudo' if pf.get_name() == 'emulab' else ''
+        os.system('ssh %s ps aux | grep cassandra | grep -v grep | grep java | awk \'{print $2}\' | xargs %s kill' % (host, sudo))
 
     seed_host = hosts[0]
     # Kill, cleanup, make directories, and run cassandra
