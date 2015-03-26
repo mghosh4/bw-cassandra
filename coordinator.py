@@ -49,7 +49,10 @@ def run_experiment(pf, hosts, throughput, workload_type, num_records, replicatio
     for host in hosts:
         print 'Killing Casandra at host %s' % host
         sudo = 'sudo' if pf.get_name() == 'emulab' else ''
-        os.system('ssh %s ps aux | grep cassandra | grep -v grep | grep java | awk \'{print $2}\' | xargs %s kill -9' % (host, sudo))
+        os.system('ssh %s ps aux | grep cassandra | grep -v grep | grep java | awk \'{print $2}\' | '
+                  'xargs ssh %s %s kill -9' % (host, host, sudo))
+
+    sleep(10)
 
     seed_host = hosts[0]
     # Kill, cleanup, make directories, and run cassandra
@@ -97,7 +100,7 @@ def experiment_on_throughput(pf):
     default_workload_type = pf.config.get('experiment', 'default_workload_type')
     default_replication_factor = int(pf.config.get('experiment', 'default_replication_factor'))
 
-    throughputs = [50000, 100000, 200000, 300000]
+    throughputs = [10000, 20000, 40000, 60000, 80000, 100000]
 
     for run in range(repeat):
         for throughput in throughputs:

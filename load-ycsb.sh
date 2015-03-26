@@ -78,6 +78,7 @@ recordcount=${NUM_RECORDS}
 
 # Run YCSB for 60 seconds
 operationcount= $(( 60 * $THROUGHPUT ))
+maxexecutiontime=60
 workload=com.yahoo.ycsb.workloads.CoreWorkload
 
 readallfields=true
