@@ -65,6 +65,17 @@ def run_experiment(pf, hosts, throughput, workload_type, num_records, replicatio
     result_dir_name = strftime('%m-%d-%H%M')
     result_path = '%s/%s' % (result_base_path, result_dir_name)
 
+    # Running YCSB load script
+    print 'Running YCSB load script'
+    ret = os.system('sh load-ycsb.sh '
+                    '--cassandra_path=%s --ycsb_path=%s '
+                    '--base_path=%s --throughput=%s --num_records=%d --workload=%s '
+                    '--replication_factor=%d --seed_host=%s --hosts=%s'
+                    % (cassandra_path, ycsb_path, result_path, throughput, num_records, workload_type,
+                       replication_factor, seed_host, ','.join(hosts)))
+    if ret != 0:
+        raise Exception('Unable to finish YCSB script')
+
     # Save configuration files for this experiment
     meta = ConfigParser.ConfigParser()
     meta.add_section('config')
@@ -77,17 +88,6 @@ def run_experiment(pf, hosts, throughput, workload_type, num_records, replicatio
     meta_file = open('%s/meta.ini' % result_path, 'w')
     meta.write(meta_file)
     meta_file.close()
-
-    # Running YCSB load script
-    print 'Running YCSB load script'
-    ret = os.system('sh load-ycsb.sh '
-                    '--cassandra_path=%s --ycsb_path=%s '
-                    '--base_path=%s --throughput=%s --num_records=%d --workload=%s '
-                    '--replication_factor=%d --seed_host=%s --hosts=%s'
-                    % (cassandra_path, ycsb_path, result_path, throughput, num_records, workload_type,
-                       replication_factor, seed_host, ','.join(hosts)))
-    if ret != 0:
-        raise Exception('Unable to finish YCSB script')
 
     threads = []
     output = []
@@ -146,7 +146,7 @@ def main():
     os.system('tar -czf /tmp/%s -C %s/.. result'
               % (result_file_name, result_base_path))
     private_key_path = pf.config.get('path', 'private_key_path')
-    os.system('scp -P8888 -i %s/sshuser_key /tmp/%s sshuser@104.236.110.182:%s/'
+    os.system('scp -o StrictHostKeyChecking=no -P8888 -i %s/sshuser_key /tmp/%s sshuser@104.236.110.182:%s/'
               % (private_key_path, result_file_name, pf.get_name()))
     os.system('rm /tmp/%s' % result_file_name)
 
