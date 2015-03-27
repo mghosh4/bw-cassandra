@@ -45,9 +45,8 @@ def run_experiment(pf, hosts, throughput, workload_type, num_records, replicatio
     # Kill cassandra on all hosts
     for host in hosts:
         print 'Killing Casandra at host %s' % host
-        sudo = 'sudo' if pf.get_name() == 'emulab' else ''
         os.system('ssh %s ps aux | grep cassandra | grep -v grep | grep java | awk \'{print $2}\' | '
-                  'xargs ssh %s %s kill -9' % (host, host, sudo))
+                  'xargs ssh %s kill -9' % (host, host))
 
     sleep(10)
 
@@ -56,8 +55,8 @@ def run_experiment(pf, hosts, throughput, workload_type, num_records, replicatio
     for host in hosts:
         cassandra_home = '%s/%s' % (cassandra_home_base_path, host)
         ret = os.system('sh deploy-cassandra-cluster.sh --orig_cassandra_path=%s --cassandra_home=%s '
-                        '--seed_host=%s --dst_host=%s --java_path=%s --profile=%s' %
-                        (cassandra_path, cassandra_home, seed_host, host, java_path, pf.get_name()))
+                        '--seed_host=%s --dst_host=%s --java_path=%s' %
+                        (cassandra_path, cassandra_home, seed_host, host, java_path))
         sleep(30)
 
     # Grace period before Cassandra completely turns on before executing YCSB
