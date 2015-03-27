@@ -62,7 +62,7 @@ def run_experiment(pf, hosts, throughput, workload_type, num_records, replicatio
         sleep(30)
 
     # Grace period before Cassandra completely turns on before executing YCSB
-    sleep(20)
+    sleep(60)
 
     result_dir_name = strftime('%m-%d-%H%M')
     result_path = '%s/%s' % (result_base_path, result_dir_name)
@@ -115,7 +115,7 @@ def experiment_on_throughput(pf):
     default_workload_type = pf.config.get('experiment', 'default_workload_type')
     default_replication_factor = int(pf.config.get('experiment', 'default_replication_factor'))
 
-    throughputs = [5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000, 45000, 50000, 55000, 60000, 65000, 70000]
+    throughputs = [5000, 10000, 15000, 20000, 25000, 30000, 40000, 50000, 60000, 70000]
 
     for run in range(repeat):
         for throughput in throughputs:

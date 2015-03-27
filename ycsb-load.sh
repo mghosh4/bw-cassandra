@@ -67,6 +67,8 @@ EOF
 # Setup keyspace and column family in Cassandra for YCSB workload
 ${CASSANDRA_PATH}/bin/cqlsh --file=/tmp/cql_input.txt ${SEED_HOST}
 
+sleep 10
+
 # Create output directory if not exists
 if [ ! -f ${BASE_PATH} ]; then
     mkdir ${BASE_PATH}
