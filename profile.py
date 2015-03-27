@@ -32,6 +32,15 @@ class BlueWatersProfile(BaseProfile):
         return 'bw'
 
 
+class BlueWatersNetworkProfile(BlueWatersProfile):
+    def __init__(self):
+        BlueWatersProfile.__init__(self)
+        self.config.read('bw-network-config.ini')
+
+    def get_name(self):
+        return 'bw-network'
+
+
 class EmulabProfile(BaseProfile):
     def __init__(self):
         BaseProfile.__init__(self)

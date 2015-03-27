@@ -131,6 +131,8 @@ def main():
     profile_name = sys.argv[1]
     if profile_name == 'bw':
         pf = profile.BlueWatersProfile()
+    elif profile_name == 'bw-network':
+        pf = profile.EmulabProfile()
     elif profile_name == 'emulab':
         pf = profile.EmulabProfile()
     else:
