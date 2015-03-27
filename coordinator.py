@@ -115,7 +115,7 @@ def experiment_on_throughput(pf):
     default_workload_type = pf.config.get('experiment', 'default_workload_type')
     default_replication_factor = int(pf.config.get('experiment', 'default_replication_factor'))
 
-    throughputs = [10000, 20000, 40000, 60000, 80000, 100000, 200000, 300000]
+    throughputs = [5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000, 45000, 50000, 55000, 60000, 65000, 70000]
 
     for run in range(repeat):
         for throughput in throughputs:
