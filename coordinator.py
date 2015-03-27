@@ -26,9 +26,11 @@ class YcsbExecuteThread(Thread):
     def run(self):
         print 'Running YCSB executor thread at host %s' % self.host
         ycsb_path = self.pf.config.get('path', 'ycsb_path')
-        ret = os.system('ssh %s \'%s/bin/ycsb run cassandra-cql -s -target %s -P %s/workload.txt '
-                        '> %s/execution-output-%s.txt\'' % (self.host, ycsb_path, self.throughput,
-                                                            self.result_path, self.result_path, self.host))
+        src_path = self.pf.config.get('path', 'src_path')
+        ret = os.system('ssh %s \'sh %s/ycsb-execute.sh --ycsb_path=%s --base_path=%s '
+                        '--throughput=%s --host=%s --profile=%s\''
+                        % (self.host, src_path, ycsb_path, self.result_path,
+                           self.throughput, self.host, self.pf.get_name()))
         self.mutex.acquire()
         self.output.append(ret)
         self.mutex.release()
@@ -67,7 +69,7 @@ def run_experiment(pf, hosts, throughput, workload_type, num_records, replicatio
 
     # Running YCSB load script
     print 'Running YCSB load script'
-    ret = os.system('sh load-ycsb.sh '
+    ret = os.system('sh ycsb-load.sh '
                     '--cassandra_path=%s --ycsb_path=%s '
                     '--base_path=%s --throughput=%s --num_records=%d --workload=%s '
                     '--replication_factor=%d --seed_host=%s --hosts=%s'
