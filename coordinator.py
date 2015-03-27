@@ -65,6 +65,19 @@ def run_experiment(pf, hosts, throughput, workload_type, num_records, replicatio
     result_dir_name = strftime('%m-%d-%H%M')
     result_path = '%s/%s' % (result_base_path, result_dir_name)
 
+    # Save configuration files for this experiment
+    meta = ConfigParser.ConfigParser()
+    meta.add_section('config')
+    meta.set('config', 'profile', pf.get_name())
+    meta.set('config', 'num_hosts', len(hosts))
+    meta.set('config', 'target_throughput', throughput)
+    meta.set('config', 'workload_type', workload_type)
+    meta.set('config', 'num_records', num_records)
+    meta.set('config', 'replication_factor', replication_factor)
+    meta_file = open('%s/meta.ini' % result_path, 'w')
+    meta.write(meta_file)
+    meta_file.close()
+
     # Running YCSB load script
     print 'Running YCSB load script'
     ret = os.system('sh load-ycsb.sh '
@@ -100,7 +113,7 @@ def experiment_on_throughput(pf):
     default_workload_type = pf.config.get('experiment', 'default_workload_type')
     default_replication_factor = int(pf.config.get('experiment', 'default_replication_factor'))
 
-    throughputs = [10000, 20000, 40000, 60000, 80000, 100000]
+    throughputs = [10000, 20000, 40000, 60000, 80000, 100000, 200000, 300000]
 
     for run in range(repeat):
         for throughput in throughputs:
