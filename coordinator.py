@@ -132,7 +132,7 @@ def main():
     if profile_name == 'bw':
         pf = profile.BlueWatersProfile()
     elif profile_name == 'bw-network':
-        pf = profile.EmulabProfile()
+        pf = profile.BlueWatersNetworkProfile()
     elif profile_name == 'emulab':
         pf = profile.EmulabProfile()
     else:

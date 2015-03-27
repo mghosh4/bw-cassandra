@@ -38,4 +38,4 @@ fi
 
 
 # Execute YCSB Workload
-${YCSB_PATH}/bin/ycsb run cassandra-cql -s -target ${THROUGHPUT} -P ${BASE_PATH}/workload.txt > ${BASE_PATH}/load-output-${HOST}.txt
+${YCSB_PATH}/bin/ycsb run cassandra-cql -s -target ${THROUGHPUT} -P ${BASE_PATH}/workload.txt > ${BASE_PATH}/execution-output-${HOST}.txt
