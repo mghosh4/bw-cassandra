@@ -10,16 +10,16 @@ import matplotlib.pyplot as plt
 data_base_path = '../data'
 
 def plot_throughput_vs_latency():
-    emulab_data_root = '%s/raw/emulab/result' % data_base_path
-    bw_data_root = '%s/raw/bw/result' % data_base_path
+    emulab_data_root = '%s/raw/emulab-ramdisk' % data_base_path
+    bw_data_root = '%s/raw/bw' % data_base_path
 
     rows = []
 
     data_roots = [emulab_data_root, bw_data_root]
-    labels = ['emulab', 'bw']
+    labels = ['emulab-ramdisk', 'bw']
     for i in range(2):
         for dir_name in os.listdir(data_roots[i]):
-            if re.search('[0-9][0-9]\-[0-9][0-9]\-[0-9][0-9][0-9][0-9]', dir_name) is not None:
+            if re.search('[0-9][0-9]\-[0-9][0-9]\-[0-9][0-9][0-9][0-9]$', dir_name) is not None:
                 cur_dir_path = '%s/%s' % (data_roots[i], dir_name)
 
                 result = None
@@ -53,7 +53,7 @@ def plot_throughput_vs_latency():
     df = pd.DataFrame(rows)
 
     plt.figure()
-    ax = df[df['profile'] == 'emulab'].plot(label='emulab', kind='scatter', x='overall_throughput', y='read_average_latency', color='DarkBlue')
+    ax = df[df['profile'] == 'emulab-ramdisk'].plot(label='emulab-ramdisk', kind='scatter', x='overall_throughput', y='read_average_latency', color='DarkBlue')
     df[df['profile'] == 'bw'].plot(label='bw', kind='scatter', x='overall_throughput', y='read_average_latency', ax=ax, color='DarkGreen')
 
     # plt.show()
