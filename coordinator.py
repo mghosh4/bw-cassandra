@@ -53,7 +53,7 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
     sleep(10)
 
     seed_host = hosts[0]
-    # Kill, cleanup, make directories, and run cassandra
+    # Cleanup, make directories, and run cassandra
     for host in hosts[0:num_cassandra_nodes]:
         cassandra_home = '%s/%s' % (cassandra_home_base_path, host)
         ret = os.system('sh deploy-cassandra-cluster.sh --orig_cassandra_path=%s --cassandra_home=%s '
@@ -76,7 +76,7 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
                     '--base_path=%s --throughput=%s --num_records=%d --workload=%s '
                     '--replication_factor=%d --seed_host=%s --hosts=%s'
                     % (cassandra_path, ycsb_path, result_path, target_throughput, num_records, workload_type,
-                       replication_factor, seed_host, ','.join(hosts)))
+                       replication_factor, seed_host, ','.join(hosts[0:num_cassandra_nodes])))
     if ret != 0:
         raise Exception('Unable to finish YCSB script')
 
@@ -119,7 +119,7 @@ def experiment_on_throughput(pf):
     default_replication_factor = int(pf.config.get('experiment', 'default_replication_factor'))
     default_num_cassandra_nodes = int(pf.config.get('experiment', 'default_num_cassandra_nodes'))
 
-    target_throughputs = pf.config.get('experiment', 'target_throughputs').split(',')
+    target_throughputs = map(int, pf.config.get('experiment', 'target_throughputs').split(','))
 
 
     for run in range(repeat):

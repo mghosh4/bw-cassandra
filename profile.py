@@ -63,3 +63,12 @@ class EmulabProfile(BaseProfile):
 
     def get_name(self):
         return 'emulab'
+
+
+class EmulabRamdiskProfile(EmulabProfile):
+    def __init__(self):
+        BaseProfile.__init__(self)
+        self.config.read('emulab-ramdisk-config.ini')
+
+    def get_name(self):
+        return 'emulab-ramdisk'

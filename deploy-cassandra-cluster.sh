@@ -116,7 +116,7 @@ bash -c "cat > ${CASSANDRA_HOME}/cassandra/conf/cassandra.yaml" <<-EOF
     sstable_preemptive_open_interval_in_mb: 50
     read_request_timeout_in_ms: 5000
     range_request_timeout_in_ms: 10000
-    write_request_timeout_in_ms: 2000
+    write_request_timeout_in_ms: 5000
     counter_write_request_timeout_in_ms: 5000
     cas_contention_timeout_in_ms: 1000
     truncate_request_timeout_in_ms: 60000
