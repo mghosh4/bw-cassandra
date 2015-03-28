@@ -141,6 +141,8 @@ def main():
         pf = profile.BlueWatersNetworkProfile()
     elif profile_name == 'emulab':
         pf = profile.EmulabProfile()
+    elif profile_name == 'emulab-ramdisk':
+        pf = profile.EmulabRamdiskProfile()
     else:
         raise Exception('Specify which profile to use...')
 
