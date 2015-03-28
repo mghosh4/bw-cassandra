@@ -41,11 +41,6 @@ cat <<EOF2 | ssh -t ${DST_HOST} /bin/bash
 JAVA_HOME=${JAVA_PATH}
 PATH=\$PATH:${JAVA_PATH}
 
-#echo "# Killing cassandra at host ${DST_HOST}..."
-#kill \$(ps aux | grep cassandra | grep -v grep | grep java | awk '{print \$2}')
-
-#sleep 5
-
 echo "# Cleaning up cassandra..."
 rm -rf ${CASSANDRA_HOME}
 

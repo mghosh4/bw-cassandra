@@ -10,6 +10,8 @@ fi
 
 # Mount Ramdisk
 if [ "`mount -l | grep /tmp/ramdisk | wc -l`" -eq "0" ]; then
+rm -rf /tmp/ramdisk
+mkdir /tmp/ramdisk
 sudo mount -t ramfs -o size=2048m ramfs /tmp/ramdisk
 fi
 
@@ -22,6 +24,6 @@ sudo -u root bash <<EOF
 ulimit -n 32768
 
 # Execute coordinator with emulab profile
-python /proj/ISS/shin14/bw-cassandra/bw-cassandra/coordinator.py emulab 2>&1 | tee /tmp/stdout
+python /proj/ISS/shin14/bw-cassandra/bw-cassandra/coordinator.py emulab-ramdisk 2>&1 | tee /tmp/stdout
 
 EOF
