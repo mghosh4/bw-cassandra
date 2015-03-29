@@ -90,6 +90,7 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
     meta.set('config', 'num_records', num_records)
     meta.set('config', 'replication_factor', replication_factor)
     meta.set('config', 'num_cassandra_nodes', num_cassandra_nodes)
+    meta.set('config', 'result_dir_name', result_dir_name)
     meta_file = open('%s/meta.ini' % result_path, 'w')
     meta.write(meta_file)
     meta_file.close()
