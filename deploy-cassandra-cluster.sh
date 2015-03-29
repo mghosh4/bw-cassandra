@@ -109,13 +109,13 @@ bash -c "cat > ${CASSANDRA_HOME}/cassandra/conf/cassandra.yaml" <<-EOF
     batch_size_warn_threshold_in_kb: 5
     compaction_throughput_mb_per_sec: 16
     sstable_preemptive_open_interval_in_mb: 50
-    read_request_timeout_in_ms: 5000
+    read_request_timeout_in_ms: 20000
     range_request_timeout_in_ms: 10000
-    write_request_timeout_in_ms: 5000
+    write_request_timeout_in_ms: 20000
     counter_write_request_timeout_in_ms: 5000
     cas_contention_timeout_in_ms: 1000
     truncate_request_timeout_in_ms: 60000
-    request_timeout_in_ms: 10000
+    request_timeout_in_ms: 20000
     cross_node_timeout: false
     endpoint_snitch: SimpleSnitch
     dynamic_snitch_update_interval_in_ms: 100

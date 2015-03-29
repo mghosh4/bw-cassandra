@@ -72,3 +72,28 @@ class EmulabRamdiskProfile(EmulabProfile):
 
     def get_name(self):
         return 'emulab-ramdisk'
+
+
+class EmulabNetworkProfile(EmulabProfile):
+    def __init__(self):
+        BaseProfile.__init__(self)
+        self.config.read('emulab-network-config.ini')
+
+    def get_name(self):
+        return 'emulab-network'
+
+
+def get_profile(profile_name):
+    if profile_name == 'bw':
+        pf = BlueWatersProfile()
+    elif profile_name == 'bw-network':
+        pf = BlueWatersNetworkProfile()
+    elif profile_name == 'emulab':
+        pf = EmulabProfile()
+    elif profile_name == 'emulab-ramdisk':
+        pf = EmulabRamdiskProfile()
+    elif profile_name == 'emulab-network':
+        pf = EmulabNetworkProfile()
+    else:
+        raise Exception('Specify which profile to use...')
+    return pf

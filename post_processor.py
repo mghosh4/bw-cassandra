@@ -53,23 +53,27 @@ def plot_throughput_vs_latency():
 
     df = pd.DataFrame(rows)
 
+    output_dir_name = strftime('%m-%d-%H%M')
+    os.mkdir('%s/processed/%s' % (data_base_path, output_dir_name))
+    df.to_csv('%s/processed/%s/data.csv' % (data_base_path, output_dir_name))
+
+    # Plot Emulab vs. Blue Waters on ram disk
     plt.figure()
     ax = df[df['profile'] == 'emulab-ramdisk'].plot(label='emulab-ramdisk', kind='scatter', x='overall_throughput', y='read_average_latency', color='DarkBlue')
     df[df['profile'] == 'bw'].plot(label='bw-ramdisk', kind='scatter', x='overall_throughput', y='read_average_latency', ax=ax, color='DarkGreen')
+    plt.savefig('%s/processed/%s/bw-emulab-latency-throughput.png' % (data_base_path, output_dir_name))
 
-    # plt.show()
-
-    output_dir_name = strftime('%m-%d-%H%M')
-    os.mkdir('%s/processed/%s' % (data_base_path, output_dir_name))
-    plt.savefig('%s/processed/%s/bw-emulab-throughput-vs-latency.png' % (data_base_path, output_dir_name))
-
-
+    # Plot BW-ramdisk vs. BW-network
     plt.figure()
     ax = df[df['profile'] == 'bw-network'].plot(label='bw-network', kind='scatter', x='overall_throughput', y='read_average_latency', color='DarkBlue')
     df[df['profile'] == 'bw'].plot(label='bw-ramdisk', kind='scatter', x='overall_throughput', y='read_average_latency', ax=ax, color='DarkGreen')
-    plt.savefig('%s/processed/%s/ramdisk-vs-network-throughput-vs-latency.png' % (data_base_path, output_dir_name))
+    plt.savefig('%s/processed/%s/bw-latency-throughput.png' % (data_base_path, output_dir_name))
 
-    df.to_csv('%s/processed/%s/data.csv' % (data_base_path, output_dir_name))
+    # Plot Emulab-ramdisk vs. Emulab-localdisk
+    plt.figure()
+    ax = df[df['profile'] == 'emulab'].plot(label='emulab-localdisk', kind='scatter', x='overall_throughput', y='read_average_latency', color='DarkBlue')
+    df[df['profile'] == 'emulab-ramdisk'].plot(label='emulab-ramdisk', kind='scatter', x='overall_throughput', y='read_average_latency', ax=ax, color='DarkGreen')
+    plt.savefig('%s/processed/%s/emulab-latency-throughput.png' % (data_base_path, output_dir_name))
 
 
 def main():

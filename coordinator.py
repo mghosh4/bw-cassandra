@@ -136,16 +136,7 @@ def experiment_on_throughput(pf):
 
 def main():
     profile_name = sys.argv[1]
-    if profile_name == 'bw':
-        pf = profile.BlueWatersProfile()
-    elif profile_name == 'bw-network':
-        pf = profile.BlueWatersNetworkProfile()
-    elif profile_name == 'emulab':
-        pf = profile.EmulabProfile()
-    elif profile_name == 'emulab-ramdisk':
-        pf = profile.EmulabRamdiskProfile()
-    else:
-        raise Exception('Specify which profile to use...')
+    pf = profile.get_profile(profile_name)
 
     # Cleanup existing result directory and create a new one
     result_file_name = strftime('%m-%d-%H%M') + '.tar.gz'
