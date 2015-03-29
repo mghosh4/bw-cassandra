@@ -83,6 +83,12 @@ def plot_throughput_vs_latency():
     df[df['profile'] == 'bw'][df['num_cassandra_nodes'] == '2'].plot(label='2 nodes', kind='scatter', x='overall_throughput', y='read_average_latency', ax=ax, color='DarkGreen')
     plt.savefig('%s/processed/%s/bw-num-nodes-latency-throughput.png' % (data_base_path, output_dir_name))
 
+    # Plot Emulab-ramdisk 1 node vs. 2 node
+    plt.figure()
+    ax = df[df['profile'] == 'emulab-ramdisk'][df['num_cassandra_nodes'] == '1'].plot(label='1 node', kind='scatter', x='overall_throughput', y='read_average_latency', color='DarkBlue')
+    df[df['profile'] == 'emulab-ramdisk'][df['num_cassandra_nodes'] == '2'].plot(label='2 nodes', kind='scatter', x='overall_throughput', y='read_average_latency', ax=ax, color='DarkGreen')
+    plt.savefig('%s/processed/%s/emulab-num-nodes-latency-throughput.png' % (data_base_path, output_dir_name))
+
 def main():
     plot_throughput_vs_latency()
 

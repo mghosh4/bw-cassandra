@@ -62,7 +62,7 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
         sleep(30)
 
     # Grace period before Cassandra completely turns on before executing YCSB
-    sleep(30)
+    sleep(60)
 
     result_dir_name = strftime('%m-%d-%H%M')
     result_path = '%s/%s' % (result_base_path, result_dir_name)
@@ -90,6 +90,7 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
     meta.set('config', 'num_records', num_records)
     meta.set('config', 'replication_factor', replication_factor)
     meta.set('config', 'num_cassandra_nodes', num_cassandra_nodes)
+    meta.set('config', 'num_ycsb_nodes', len(hosts) - num_cassandra_nodes)
     meta.set('config', 'result_dir_name', result_dir_name)
     meta_file = open('%s/meta.ini' % result_path, 'w')
     meta.write(meta_file)
@@ -101,7 +102,7 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
 
     # Run YCSB executor threads in parallel at each host
     print 'Running YCSB execute workload at each host in parallel...'
-    for host in hosts:
+    for host in hosts[num_cassandra_nodes:]:
         current_thread = YcsbExecuteThread(pf, host, target_throughput, result_path, output, mutex)
         threads.append(current_thread)
         current_thread.start()
