@@ -62,7 +62,7 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
         sleep(30)
 
     # Grace period before Cassandra completely turns on before executing YCSB
-    sleep(60)
+    sleep(30)
 
     result_dir_name = strftime('%m-%d-%H%M')
     result_path = '%s/%s' % (result_base_path, result_dir_name)
