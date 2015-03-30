@@ -46,4 +46,13 @@ def parse_execution_output(buf):
         if line.find('RunTime') != -1:
             result_dict['runtime'] = float(line.split(' ')[2])
 
+    if not result_dict.has_key('update_average_latency') or \
+            not result_dict.has_key('read_average_latency') or \
+            not result_dict.has_key('overall_throughput') or \
+            not result_dict.has_key('update_num_operations') or \
+            not result_dict.has_key('read_num_operations') or \
+            not result_dict.has_key('overall_num_operations') or \
+            not result_dict.has_key('runtime'):
+        raise Exception('Could not parse YCSB result...')
+
     return result_dict

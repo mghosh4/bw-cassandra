@@ -5,7 +5,16 @@ from threading import Thread
 import thread
 import sys
 import profile
+import logging
 
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s: '
+                           '%(filename)s: '
+                           '%(levelname)s: '
+                           '%(funcName)s(): '
+                           '%(lineno)d:\t'
+                           '%(message)s')
+logger = logging.getLogger(__name__)
 
 private_config = ConfigParser.SafeConfigParser()
 private_config.read('private.ini')
@@ -24,7 +33,7 @@ class YcsbExecuteThread(Thread):
         self.mutex = mutex
 
     def run(self):
-        print 'Running YCSB executor thread at host %s' % self.host
+        loger.debug('Running YCSB executor thread at host %s' % self.host)
         ycsb_path = self.pf.config.get('path', 'ycsb_path')
         src_path = self.pf.config.get('path', 'src_path')
         ret = os.system('ssh %s \'sh %s/ycsb-execute.sh --ycsb_path=%s --base_path=%s '
@@ -34,19 +43,27 @@ class YcsbExecuteThread(Thread):
         self.mutex.acquire()
         self.output.append(ret)
         self.mutex.release()
-        print 'Finished running YCSB executor thread at host %s' % self.host
+        logger.debug('Finished running YCSB executor thread at host %s' % self.host)
 
 
-def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_records, replication_factor, num_cassandra_nodes):
+def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_records, replication_factor,
+                   num_cassandra_nodes):
     cassandra_path = pf.config.get('path', 'cassandra_path')
     cassandra_home_base_path = pf.config.get('path', 'cassandra_home_base_path')
     ycsb_path = pf.config.get('path', 'ycsb_path')
     java_path = pf.config.get('path', 'java_path')
     result_base_path = pf.config.get('path', 'result_base_path')
 
+    result_dir_name = strftime('%m-%d-%H%M')
+    result_path = '%s/%s' % (result_base_path, result_dir_name)
+    logger.debug('Executing w/ pf=%s, num_hosts=%d, overall_target_throughput=%d, workload_type=%s, ' \
+                 'num_records=%d, replication_factor=%d, num_cassandra_nodes=%d, result_dir_name=%s' % \
+                 (pf, len(hosts), overall_target_throughput, workload_type,
+                  num_records, replication_factor, num_cassandra_nodes, result_dir_name))
+
     # Kill cassandra on all hosts
     for host in hosts:
-        print 'Killing Casandra at host %s' % host
+        logger.debug('Killing Casandra at host %s' % host)
         os.system('ssh %s ps aux | grep cassandra | grep -v grep | grep java | awk \'{print $2}\' | '
                   'xargs ssh %s kill -9' % (host, host))
 
@@ -64,13 +81,11 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
     # Grace period before Cassandra completely turns on before executing YCSB
     sleep(60)
 
-    result_dir_name = strftime('%m-%d-%H%M')
-    result_path = '%s/%s' % (result_base_path, result_dir_name)
-
-    target_throughput = overall_target_throughput / len(hosts)
+    num_ycsb_nodes = len(hosts) - num_cassandra_nodes
+    target_throughput = overall_target_throughput / num_ycsb_nodes
 
     # Running YCSB load script
-    print 'Running YCSB load script'
+    logger.debug('Running YCSB load script')
     ret = os.system('sh ycsb-load.sh '
                     '--cassandra_path=%s --ycsb_path=%s '
                     '--base_path=%s --throughput=%s --num_records=%d --workload=%s '
@@ -90,7 +105,7 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
     meta.set('config', 'num_records', num_records)
     meta.set('config', 'replication_factor', replication_factor)
     meta.set('config', 'num_cassandra_nodes', num_cassandra_nodes)
-    meta.set('config', 'num_ycsb_nodes', len(hosts) - num_cassandra_nodes)
+    meta.set('config', 'num_ycsb_nodes', num_ycsb_nodes)
     meta.set('config', 'result_dir_name', result_dir_name)
     meta_file = open('%s/meta.ini' % result_path, 'w')
     meta.write(meta_file)
@@ -101,7 +116,7 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
     mutex = thread.allocate_lock()
 
     # Run YCSB executor threads in parallel at each host
-    print 'Running YCSB execute workload at each host in parallel...'
+    logger.debug('Running YCSB execute workload at each host in parallel...')
     for host in hosts[num_cassandra_nodes:]:
         current_thread = YcsbExecuteThread(pf, host, target_throughput, result_path, output, mutex)
         threads.append(current_thread)
@@ -110,19 +125,17 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
     for t in threads:
         t.join()
 
-    print 'Threads finished executing with outputs: %s...' % output
+    logger.debug('Threads finished executing with outputs: %s...' % output)
 
 
 # differ throughputs
-def experiment_on_throughput(pf):
+def experiment_on_throughput(pf, num_cassandra_nodes):
     repeat = int(pf.config.get('experiment', 'repeat'))
     default_num_records = int(pf.config.get('experiment', 'default_num_records'))
     default_workload_type = pf.config.get('experiment', 'default_workload_type')
     default_replication_factor = int(pf.config.get('experiment', 'default_replication_factor'))
-    default_num_cassandra_nodes = int(pf.config.get('experiment', 'default_num_cassandra_nodes'))
 
     target_throughputs = map(int, pf.config.get('experiment', 'target_throughputs').split(','))
-
 
     for run in range(repeat):
         for throughput in target_throughputs:
@@ -132,7 +145,12 @@ def experiment_on_throughput(pf):
                                     num_records=default_num_records,
                                     workload_type=default_workload_type,
                                     replication_factor=default_replication_factor,
-                                    num_cassandra_nodes=default_num_cassandra_nodes)
+                                    num_cassandra_nodes=num_cassandra_nodes)
+
+
+def experiment_on_num_cassandra_nodes_and_throughput(pf):
+    for num_cassandra_nodes in range(1, 6):
+        experiment_on_throughput(pf, num_cassandra_nodes)
 
 
 def main():
@@ -145,7 +163,11 @@ def main():
     os.system('rm -rf %s;mkdir %s' % (result_base_path, result_base_path))
 
     # Do all experiments here
-    experiment_on_throughput(pf)
+    experiment_on_throughput(pf, int(pf.config.get('experiment', 'default_num_cassandra_nodes')))
+    # experiment_on_num_cassandra_nodes_and_throughput(pf)
+
+    # Copy log to result directory
+    os.system('cp /tmp/bw-cassandra-log.txt %s/' % result_base_path)
 
     # Archive the result and send to remote server
     os.system('tar -czf /tmp/%s -C %s .'
@@ -154,6 +176,7 @@ def main():
     os.system('scp -o StrictHostKeyChecking=no -P8888 -i %s/sshuser_key /tmp/%s sshuser@104.236.110.182:%s/'
               % (private_key_path, result_file_name, pf.get_name()))
     os.system('rm /tmp/%s' % result_file_name)
+
 
 if __name__ == "__main__":
     main()
