@@ -129,13 +129,12 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
 
 
 # differ throughputs
-def experiment_on_throughput(pf, num_cassandra_nodes):
-    repeat = int(pf.config.get('experiment', 'repeat'))
+def experiment_on_throughput(pf, num_cassandra_nodes, repeat):
     default_num_records = int(pf.config.get('experiment', 'default_num_records'))
     default_workload_type = pf.config.get('experiment', 'default_workload_type')
     default_replication_factor = int(pf.config.get('experiment', 'default_replication_factor'))
 
-    target_throughputs = map(int, pf.config.get('experiment', 'target_throughputs').split(','))
+    target_throughputs = pf.get_heuristic_target_throughputs(num_cassandra_nodes)
 
     for run in range(repeat):
         for throughput in target_throughputs:
@@ -148,9 +147,10 @@ def experiment_on_throughput(pf, num_cassandra_nodes):
                                     num_cassandra_nodes=num_cassandra_nodes)
 
 
-def experiment_on_num_cassandra_nodes_and_throughput(pf):
-    for num_cassandra_nodes in range(1, 6):
-        experiment_on_throughput(pf, num_cassandra_nodes)
+def experiment_on_num_cassandra_nodes_and_throughput(pf, repeat):
+    for run in range(repeat):
+        for num_cassandra_nodes in range(1, 9):
+            experiment_on_throughput(pf, num_cassandra_nodes, 1)
 
 
 def main():
@@ -162,9 +162,11 @@ def main():
     result_base_path = pf.config.get('path', 'result_base_path')
     os.system('rm -rf %s;mkdir %s' % (result_base_path, result_base_path))
 
+    repeat = int(pf.config.get('experiment', 'repeat'))
+
     # Do all experiments here
-    experiment_on_throughput(pf, int(pf.config.get('experiment', 'default_num_cassandra_nodes')))
-    # experiment_on_num_cassandra_nodes_and_throughput(pf)
+    # experiment_on_throughput(pf, int(pf.config.get('experiment', 'default_num_cassandra_nodes')), repeat)
+    experiment_on_num_cassandra_nodes_and_throughput(pf, repeat)
 
     # Copy log to result directory
     os.system('cp %s/bw-cassandra-log.txt %s/' % (pf.get_log_path(), result_base_path))
