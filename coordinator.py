@@ -92,14 +92,15 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
     #                 '--replication_factor=%d --seed_host=%s --hosts=%s'
     #                 % (cassandra_path, ycsb_path, result_path, target_throughput, num_records, workload_type,
     #                    replication_factor, seed_host, ','.join(hosts[0:num_cassandra_nodes])))
-
+    src_path = pf.config.get('path', 'src_path')
+    cassandra_nodes_hosts = ','.join(hosts[0:num_cassandra_nodes])
     ret = os.system('ssh %s \'sh %s/ycsb-load.sh '
                     '--cassandra_path=%s --ycsb_path=%s '
                     '--base_path=%s --throughput=%s --num_records=%d --workload=%s '
-                    '--replication_factor=%d --seed_host=%s --hosts=%s'
-                    % (hosts[num_cassandra_nodes], ycsb_path, cassandra_path, ycsb_path,
+                    '--replication_factor=%d --seed_host=%s --hosts=%s\''
+                    % (hosts[num_cassandra_nodes], src_path, cassandra_path, ycsb_path,
                        result_path, target_throughput, num_records, workload_type,
-                       replication_factor, seed_host, ','.join(hosts[0:num_cassandra_nodes])))
+                       replication_factor, seed_host, cassandra_nodes_hosts))
     if ret != 0:
         raise Exception('Unable to finish YCSB script')
 
