@@ -31,6 +31,9 @@ class BlueWatersProfile(BaseProfile):
     def get_name(self):
         return 'bw'
 
+    def get_log_path(self):
+        return '/u/sciteam/shin1/scratch'
+
 
 class BlueWatersNetworkProfile(BlueWatersProfile):
     def __init__(self):
@@ -63,6 +66,9 @@ class EmulabProfile(BaseProfile):
 
     def get_name(self):
         return 'emulab'
+
+    def get_log_path(self):
+        return '/tmp'
 
 
 class EmulabRamdiskProfile(EmulabProfile):

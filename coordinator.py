@@ -33,7 +33,7 @@ class YcsbExecuteThread(Thread):
         self.mutex = mutex
 
     def run(self):
-        loger.debug('Running YCSB executor thread at host %s' % self.host)
+        logger.debug('Running YCSB executor thread at host %s' % self.host)
         ycsb_path = self.pf.config.get('path', 'ycsb_path')
         src_path = self.pf.config.get('path', 'src_path')
         ret = os.system('ssh %s \'sh %s/ycsb-execute.sh --ycsb_path=%s --base_path=%s '
@@ -58,7 +58,7 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
     result_path = '%s/%s' % (result_base_path, result_dir_name)
     logger.debug('Executing w/ pf=%s, num_hosts=%d, overall_target_throughput=%d, workload_type=%s, ' \
                  'num_records=%d, replication_factor=%d, num_cassandra_nodes=%d, result_dir_name=%s' % \
-                 (pf, len(hosts), overall_target_throughput, workload_type,
+                 (pf.get_name(), len(hosts), overall_target_throughput, workload_type,
                   num_records, replication_factor, num_cassandra_nodes, result_dir_name))
 
     # Kill cassandra on all hosts
@@ -167,7 +167,7 @@ def main():
     # experiment_on_num_cassandra_nodes_and_throughput(pf)
 
     # Copy log to result directory
-    os.system('cp /tmp/bw-cassandra-log.txt %s/' % result_base_path)
+    os.system('cp %s/bw-cassandra-log.txt %s/' % (pf.get_log_path(), result_base_path))
 
     # Archive the result and send to remote server
     os.system('tar -czf /tmp/%s -C %s .'
