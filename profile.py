@@ -40,7 +40,7 @@ class BlueWatersProfile(BaseProfile):
         throughput_delta_for_added_node = 30000
         safety_ratio = 1.3
 
-        heuristic_max_throughput = (single_node_throughput + (num_cassandra_nodes - 1) * throughput_delta_for_added_node) * safety_ratio
+        heuristic_max_throughput = int((single_node_throughput + (num_cassandra_nodes - 1) * throughput_delta_for_added_node) * safety_ratio)
         return range(interval, heuristic_max_throughput, interval)
 
 
@@ -85,7 +85,7 @@ class EmulabProfile(BaseProfile):
         throughput_delta_for_added_node = 20000
         safety_ratio = 1.3
 
-        heuristic_max_throughput = (single_node_throughput + (num_cassandra_nodes - 1) * throughput_delta_for_added_node) * safety_ratio
+        heuristic_max_throughput = int((single_node_throughput + (num_cassandra_nodes - 1) * throughput_delta_for_added_node) * safety_ratio)
         return range(interval, heuristic_max_throughput, interval)
 
 
