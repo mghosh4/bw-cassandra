@@ -8,5 +8,5 @@ APRUN_XFER_LIMITS=1
 
 module add ccm
 
-cd /u/sciteam/shin1/scratch
+cd /u/sciteam/shin1/scratch/bw-cassandra
 ccmrun sh bw-ccmrun.sh
