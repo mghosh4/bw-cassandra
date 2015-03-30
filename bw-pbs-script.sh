@@ -4,9 +4,9 @@
 #PBS -l walltime=02:00:00
 #PBS -l gres=ccm
 
-APRUN_XFER_LIMITS=1 
+export APRUN_XFER_LIMITS=1 
 
-module add ccm
+module load ccm
 
 cd /u/sciteam/shin1/scratch/bw-cassandra
 ccmrun sh bw-ccmrun.sh
