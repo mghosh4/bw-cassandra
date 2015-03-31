@@ -92,7 +92,7 @@ insertproportion=0
 
 requestdistribution=${WORKLOAD}
 
-threadcount=50
+threadcount=100
 
 # For CQL client
 hosts=${HOSTS}
