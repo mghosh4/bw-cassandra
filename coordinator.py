@@ -23,7 +23,7 @@ workload_types = ['uniform', 'zipfian', 'latest', 'readonly']
 
 
 class YcsbExecuteThread(Thread):
-    def __init__(self, pf, host, target_throughput, result_path, output, mutex):
+    def __init__(self, pf, host, target_throughput, result_path, output, mutex, delay_in_millisec):
         Thread.__init__(self)
         self.pf = pf
         self.host = host
@@ -31,15 +31,16 @@ class YcsbExecuteThread(Thread):
         self.result_path = result_path
         self.output = output
         self.mutex = mutex
+        self.delay_in_millisec = delay_in_millisec
 
     def run(self):
-        logger.debug('Running YCSB executor thread at host %s' % self.host)
+        logger.debug('Running YCSB executor thread at host %s with %d ms delay' % (self.host, self.delay_in_millisec))
         ycsb_path = self.pf.config.get('path', 'ycsb_path')
         src_path = self.pf.config.get('path', 'src_path')
         ret = os.system('ssh %s \'sh %s/ycsb-execute.sh --ycsb_path=%s --base_path=%s '
-                        '--throughput=%s --host=%s --profile=%s\''
+                        '--throughput=%s --host=%s --profile=%s --delay_in_millisec=%d\''
                         % (self.host, src_path, ycsb_path, self.result_path,
-                           self.target_throughput, self.host, self.pf.get_name()))
+                           self.target_throughput, self.host, self.pf.get_name(), self.delay_in_millisec))
         self.mutex.acquire()
         self.output.append(ret)
         self.mutex.release()
@@ -72,6 +73,7 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
     seed_host = hosts[0]
     # Cleanup, make directories, and run cassandra
     for host in hosts[0:num_cassandra_nodes]:
+        logger.debug('Deploying cassandra at host %s' % host)
         cassandra_home = '%s/%s' % (cassandra_home_base_path, host)
         ret = os.system('sh deploy-cassandra-cluster.sh --orig_cassandra_path=%s --cassandra_home=%s '
                         '--seed_host=%s --dst_host=%s --java_path=%s' %
@@ -79,7 +81,7 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
         sleep(30)
 
     # Grace period before Cassandra completely turns on before executing YCSB
-    sleep(60)
+    sleep(15)
 
     num_ycsb_nodes = len(hosts) - num_cassandra_nodes
     target_throughput = overall_target_throughput / num_ycsb_nodes
@@ -118,14 +120,19 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
     output = []
     mutex = thread.allocate_lock()
 
-    sleep(30)
+    sleep(10)
 
     # Run YCSB executor threads in parallel at each host
     logger.debug('Running YCSB execute workload at each host in parallel...')
+    base_warmup_time_in_millisec = 15000
+    interval_in_millisec = 3000
+    delay_in_millisec = num_ycsb_nodes * interval_in_millisec + base_warmup_time_in_millisec
     for host in hosts[num_cassandra_nodes:]:
-        current_thread = YcsbExecuteThread(pf, host, target_throughput, result_path, output, mutex)
+        current_thread = YcsbExecuteThread(pf, host, target_throughput, result_path, output, mutex, delay_in_millisec)
         threads.append(current_thread)
         current_thread.start()
+        delay_in_millisec -= interval_in_millisec
+        sleep(interval_in_millisec * 0.001)
 
     for t in threads:
         t.join()

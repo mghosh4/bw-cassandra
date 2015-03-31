@@ -102,9 +102,9 @@ columnfamily=usertable
 histogram.buckets=10000
 
 # number of operations in warmup phase, if zero then don't warmup(default: 0)
-warmupoperationcount=100000
+#warmupoperationcount=100000
 # execution time of warmup phase in milliseconds, if zero then don't warmup (default: 0)
-warmupexecutiontime=30000
+#warmupexecutiontime=30000
 
 EOF
 
