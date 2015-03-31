@@ -78,7 +78,7 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
         ret = os.system('sh deploy-cassandra-cluster.sh --orig_cassandra_path=%s --cassandra_home=%s '
                         '--seed_host=%s --dst_host=%s --java_path=%s' %
                         (cassandra_path, cassandra_home, seed_host, host, java_path))
-        sleep(30)
+        sleep(15)
 
     num_ycsb_nodes = len(hosts) - num_cassandra_nodes
     target_throughput = overall_target_throughput / num_ycsb_nodes
