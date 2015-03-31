@@ -19,6 +19,20 @@ mkdir /tmp/ramdisk
 sudo mount -t tmpfs -o size=4096M tmpfs /tmp/ramdisk
 fi
 
+
+# Adjust max number of files
+if [ "`ulimit -n`" -eq "1024" ]; then
+cat << FOE >> /etc/security/limits.conf
+
+*       hard    nofile   32768
+*       soft    nofile   32768
+root    hard    nofile   32768
+root    soft    nofile   32768
+
+FOE
+fi
+
+
 EOF
 
 
