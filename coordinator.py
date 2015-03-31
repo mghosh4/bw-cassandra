@@ -80,9 +80,6 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
                         (cassandra_path, cassandra_home, seed_host, host, java_path))
         sleep(30)
 
-    # Grace period before Cassandra completely turns on before executing YCSB
-    sleep(15)
-
     num_ycsb_nodes = len(hosts) - num_cassandra_nodes
     target_throughput = overall_target_throughput / num_ycsb_nodes
 
