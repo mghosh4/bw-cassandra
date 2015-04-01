@@ -38,9 +38,6 @@ EOF
 
 sudo -u root bash <<EOF
 
-# Updating maximum opened file descriptor limit
-ulimit -n 32768
-
 # Execute coordinator with emulab profile
 python /proj/ISS/shin14/bw-cassandra/bw-cassandra/coordinator.py emulab-ramdisk 2>&1 | tee /tmp/bw-cassandra-log.txt
 

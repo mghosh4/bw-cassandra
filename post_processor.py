@@ -6,13 +6,13 @@ import ycsb_parser
 import re
 import matplotlib.pyplot as plt
 import matplotlib
-
+import numpy
 
 data_base_path = '../data'
 
 def plot_throughput_vs_latency():
     # profile_names = ['emulab-ramdisk', 'emulab', 'emulab-network', 'bw', 'bw-network']
-    profile_names = ['emulab-ramdisk', 'bw']
+    profile_names = ['emulab-ramdisk']
 
     rows = []
 
@@ -85,22 +85,35 @@ def plot_throughput_vs_latency():
     # df_1node[df_1node['profile'] == 'emulab-network'].plot(label='emulab-network', kind='scatter', x='overall_throughput', y='read_average_latency', ax=ax, color='Red')
     # plt.savefig('%s/processed/%s/emulab-latency-throughput.png' % (data_base_path, output_dir_name))
 
-    # # Plot BW-ramdisk 1 node vs. 2 node vs. 3 nodes
-    plt.figure()
-    cmap = matplotlib.cm.get_cmap('Spectral')
-    colors = ['red', 'black', 'yellow', 'green', 'blue', 'violet']
-    ax = df[df['profile'] == 'bw'][df['num_cassandra_nodes'] == '1'].plot(label='1 node', kind='scatter', x='overall_throughput', y='read_average_latency', color=colors[0])
-    for i in range(2, 6):
-        df[df['profile'] == 'bw'][df['num_cassandra_nodes'] == ('%d' % i)].plot(label=('%d nodes' % i), kind='scatter', x='overall_throughput', y='read_average_latency', ax=ax, color=colors[i])
-    ax.legend(loc='best')
-    plt.savefig('%s/processed/%s/bw-num-nodes-latency-throughput.png' % (data_base_path, output_dir_name))
+    # # # Plot BW-ramdisk 1 node vs. 2 node vs. 3 nodes
+    # plt.figure()
+    # colors = [None, 'red', 'black', 'yellow', 'green', 'blue', 'violet', 'pink', 'LightBlue']
+    # ax = df[df['profile'] == 'bw'][df['num_cassandra_nodes'] == '1'].plot(label='1 node', kind='scatter', x='overall_throughput', y='read_average_latency', color=colors[1])
+    # for i in range(2, 6):
+    #     df[df['profile'] == 'bw'][df['num_cassandra_nodes'] == ('%d' % i)].plot(label=('%d nodes' % i), kind='scatter', x='overall_throughput', y='read_average_latency', ax=ax, color=colors[i])
+    # ax.legend(loc='best')
+    # plt.savefig('%s/processed/%s/bw-num-nodes-latency-throughput.png' % (data_base_path, output_dir_name))
+    #
+    # # Plot Emulab-ramdisk 1 node vs. 2 node
+    # plt.figure()
+    # ax = df[df['profile'] == 'emulab-ramdisk'][df['num_cassandra_nodes'] == '1'][df['num_hosts'] == '20'].plot(label='1 node', kind='scatter', x='overall_throughput', y='read_average_latency', color=colors[1])
+    # for i in range(2, 8):
+    #     df[df['profile'] == 'emulab-ramdisk'][df['num_cassandra_nodes'] == ('%d' % i)].plot(label=('%d nodes' % i), kind='scatter', x='overall_throughput', y='read_average_latency', ax=ax, color=colors[i])
+    # # df[df['profile'] == 'emulab-ramdisk'][df['num_cassandra_nodes'] == '2'][df['num_hosts'] == '20'].plot(label='2 nodes', kind='scatter', x='overall_throughput', y='read_average_latency', ax=ax, color='DarkGreen')
+    # # df[df['profile'] == 'emulab-ramdisk'][df['num_cassandra_nodes'] == '3'][df['num_hosts'] == '20'].plot(label='3 nodes', kind='scatter', x='overall_throughput', y='read_average_latency', ax=ax, color='Red')
+    # # df[df['profile'] == 'emulab-ramdisk'][df['num_cassandra_nodes'] == '4'][df['num_hosts'] == '20'].plot(label='4 nodes', kind='scatter', x='overall_throughput', y='read_average_latency', ax=ax, color='Yellow')
+    # ax.legend(loc='best')
+    # plt.savefig('%s/processed/%s/emulab-num-nodes-latency-throughput.png' % (data_base_path, output_dir_name))
 
-    # Plot Emulab-ramdisk 1 node vs. 2 node
     plt.figure()
-    ax = df[df['profile'] == 'emulab-ramdisk'][df['num_cassandra_nodes'] == '1'][df['num_hosts'] == '20'].plot(label='1 node', kind='scatter', x='overall_throughput', y='read_average_latency', color='DarkBlue')
-    # df[df['profile'] == 'emulab-ramdisk'][df['num_cassandra_nodes'] == '2'][df['num_hosts'] == '20'].plot(label='2 nodes', kind='scatter', x='overall_throughput', y='read_average_latency', ax=ax, color='DarkGreen')
-    # df[df['profile'] == 'emulab-ramdisk'][df['num_cassandra_nodes'] == '3'][df['num_hosts'] == '20'].plot(label='3 nodes', kind='scatter', x='overall_throughput', y='read_average_latency', ax=ax, color='Red')
-    # df[df['profile'] == 'emulab-ramdisk'][df['num_cassandra_nodes'] == '4'][df['num_hosts'] == '20'].plot(label='4 nodes', kind='scatter', x='overall_throughput', y='read_average_latency', ax=ax, color='Yellow')
+    colors = matplotlib.cm.rainbow(numpy.linspace(0, 1, 8))
+    # ['.', ',', 'o', 'v', '^', '<', '>', '1', '2', '3', '4', 's', 'p', '*', 'h', 'H', '+', 'x', 'D', 'd', '|', '_']
+    markers = ['o', '^', 's', 'p', '*', 'h', '+', 'x', 'D', '|', '_']
+    for i in range(0, 7):
+        cur_df = df[df['profile'] == 'emulab-ramdisk'][df['num_cassandra_nodes'] == '%d' % (i + 1)]
+        plt.scatter(x=cur_df['overall_throughput'], y=cur_df['read_average_latency'], c=colors[i], marker=markers[i],
+                    label='%d nodes' % (i + 1))
+    plt.legend(loc='best')
     plt.savefig('%s/processed/%s/emulab-num-nodes-latency-throughput.png' % (data_base_path, output_dir_name))
 
     # ax = df[df['profile'] == 'emulab-ramdisk'][df['num_cassandra_nodes'] == '1'][df['num_hosts'] == '20'].plot(label='1 node', kind='scatter', x='overall_throughput', y='read_average_latency', color='DarkBlue')

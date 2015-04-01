@@ -78,9 +78,9 @@ fi
 cat > ${BASE_PATH}/workload.txt <<EOF
 recordcount=${NUM_RECORDS}
 
-# Run YCSB for 60 seconds
-operationcount= $(( 60 * $THROUGHPUT ))
-maxexecutiontime=60
+# Run YCSB for 120 seconds
+operationcount= $(( 120 * $THROUGHPUT ))
+maxexecutiontime=120
 workload=com.yahoo.ycsb.workloads.CoreWorkload
 
 readallfields=true
@@ -92,7 +92,7 @@ insertproportion=0
 
 requestdistribution=${WORKLOAD}
 
-threadcount=100
+threadcount=250
 
 # For CQL client
 hosts=${HOSTS}
