@@ -121,8 +121,8 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
 
     # Run YCSB executor threads in parallel at each host
     logger.debug('Running YCSB execute workload at each host in parallel...')
-    base_warmup_time_in_millisec = 10000
-    interval_in_millisec = 15000
+    base_warmup_time_in_millisec = 20000
+    interval_in_millisec = 10000
     delay_in_millisec = num_ycsb_nodes * interval_in_millisec + base_warmup_time_in_millisec
     for host in hosts[num_cassandra_nodes:]:
         current_thread = YcsbExecuteThread(pf, host, target_throughput, result_path, output, mutex, delay_in_millisec)
@@ -158,7 +158,7 @@ def experiment_on_throughput(pf, num_cassandra_nodes, repeat):
 
 def experiment_on_num_cassandra_nodes_and_throughput(pf, repeat):
     for run in range(repeat):
-        for num_cassandra_nodes in range(1, 9):
+        for num_cassandra_nodes in range(1, pf.get_max_num_cassandra_nodes() + 1):
             experiment_on_throughput(pf, num_cassandra_nodes, 1)
 
 

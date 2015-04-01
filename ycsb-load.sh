@@ -78,9 +78,9 @@ fi
 cat > ${BASE_PATH}/workload.txt <<EOF
 recordcount=${NUM_RECORDS}
 
-# Run YCSB for 120 seconds
-operationcount= $(( 120 * $THROUGHPUT ))
-maxexecutiontime=120
+# Run YCSB for 300 seconds
+operationcount= $(( 300 * $THROUGHPUT ))
+maxexecutiontime=300
 workload=com.yahoo.ycsb.workloads.CoreWorkload
 
 readallfields=true

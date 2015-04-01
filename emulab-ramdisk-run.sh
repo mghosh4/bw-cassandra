@@ -24,10 +24,10 @@ fi
 if [ "`ulimit -n`" -eq "1024" ]; then
 cat << FOE >> /etc/security/limits.conf
 
-*       hard    nofile   32768
-*       soft    nofile   32768
-root    hard    nofile   32768
-root    soft    nofile   32768
+*       hard    nofile   1048576
+*       soft    nofile   1048576
+root    hard    nofile   1048576
+root    soft    nofile   1048576
 
 FOE
 fi
