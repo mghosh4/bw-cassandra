@@ -87,13 +87,14 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
     logger.debug('Running YCSB load script')
     src_path = pf.config.get('path', 'src_path')
     cassandra_nodes_hosts = ','.join(hosts[0:num_cassandra_nodes])
+    num_ycsb_threads = pf.get_num_ycsb_threads()
     ret = os.system('ssh %s \'sh %s/ycsb-load.sh '
                     '--cassandra_path=%s --ycsb_path=%s '
                     '--base_path=%s --throughput=%s --num_records=%d --workload=%s '
-                    '--replication_factor=%d --seed_host=%s --hosts=%s\''
+                    '--replication_factor=%d --seed_host=%s --hosts=%s --num_threads=%d\''
                     % (hosts[num_cassandra_nodes], src_path, cassandra_path, ycsb_path,
                        result_path, target_throughput, num_records, workload_type,
-                       replication_factor, seed_host, cassandra_nodes_hosts))
+                       replication_factor, seed_host, cassandra_nodes_hosts, num_ycsb_threads))
     if ret != 0:
         raise Exception('Unable to finish YCSB script')
 
@@ -121,8 +122,8 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
 
     # Run YCSB executor threads in parallel at each host
     logger.debug('Running YCSB execute workload at each host in parallel...')
-    base_warmup_time_in_millisec = 20000
-    interval_in_millisec = 15000
+    base_warmup_time_in_millisec = 10000
+    interval_in_millisec = 10000
     delay_in_millisec = num_ycsb_nodes * interval_in_millisec + base_warmup_time_in_millisec
     for host in hosts[num_cassandra_nodes:]:
         current_thread = YcsbExecuteThread(pf, host, target_throughput, result_path, output, mutex, delay_in_millisec)
@@ -174,8 +175,8 @@ def main():
     repeat = int(pf.config.get('experiment', 'repeat'))
 
     # Do all experiments here
-    # experiment_on_throughput(pf, int(pf.config.get('experiment', 'default_num_cassandra_nodes')), repeat)
-    experiment_on_num_cassandra_nodes_and_throughput(pf, repeat)
+    experiment_on_throughput(pf, int(pf.config.get('experiment', 'default_num_cassandra_nodes')), repeat)
+    # experiment_on_num_cassandra_nodes_and_throughput(pf, repeat)
 
     # Copy log to result directory
     os.system('cp %s/bw-cassandra-log.txt %s/' % (pf.get_log_path(), result_base_path))

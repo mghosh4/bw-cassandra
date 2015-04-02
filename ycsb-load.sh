@@ -42,6 +42,10 @@ case $i in
     HOSTS="${i#*=}"
     shift
     ;;
+    --num_threads=*)
+    NUM_THREADS="${i#*=}"
+    shift
+    ;;
     *)
             # unknown option
     ;;
@@ -92,7 +96,7 @@ insertproportion=0
 
 requestdistribution=${WORKLOAD}
 
-threadcount=250
+threadcount=${NUM_THREADS}
 
 # For CQL client
 hosts=${HOSTS}

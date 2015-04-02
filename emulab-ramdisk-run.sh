@@ -21,13 +21,13 @@ fi
 
 
 # Adjust max number of files
-if [ "`ulimit -n`" -eq "1024" ]; then
+if [ "\`ulimit -n\`" -eq "1024" ]; then
 cat << FOE >> /etc/security/limits.conf
 
-*       hard    nofile   1048576
-*       soft    nofile   1048576
-root    hard    nofile   1048576
-root    soft    nofile   1048576
+*    -   memlock  unlimited
+*    -   nofile   1048576
+root    -   memlock  unlimited
+root    -   nofile   1048576
 
 FOE
 fi

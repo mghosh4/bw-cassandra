@@ -1,3 +1,6 @@
+import re
+
+
 class YcsbResult(object):
     def __init__(self):
         super(YcsbResult, self).__init__()
@@ -54,5 +57,29 @@ def parse_execution_output(buf):
             not result_dict.has_key('overall_num_operations') or \
             not result_dict.has_key('runtime'):
         raise Exception('Could not parse YCSB result...')
+
+    return result_dict
+
+
+# 'read' or 'update'?
+def parse_latency_bucket(buf, type_):
+    assert type_ == 'read' or type_ == 'update'
+    all_lines = buf.split('\n')
+
+    to_match = '[%s]' % type_.upper()
+
+    def latency_lines_filter(x):
+        splitted = [y.strip() for y in x.split(',')]
+        return x.find(to_match) != -1 and re.match('^[0-9]+$', splitted[1])
+
+    latency_lines = filter(latency_lines_filter, all_lines)
+
+    result_dict = dict()
+    for l in latency_lines:
+        split = [y.strip() for y in l.split(',')]
+        assert len(split) == 3
+        millisec = int(split[1])
+        count = int(split[2])
+        result_dict[millisec] = count
 
     return result_dict

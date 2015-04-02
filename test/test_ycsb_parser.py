@@ -1,7 +1,7 @@
 from unittest import TestCase
 from StringIO import StringIO
 
-import ycsb_parser
+import repo.ycsb_parser as ycsb_parser
 
 __author__ = 'Daniel'
 
@@ -23,3 +23,9 @@ class TestYcsbParser(TestCase):
         sio = StringIO('hello world')
         s = str(sio)
         print s.__class__
+
+    def test_parse_latency_bucket(self):
+        f = open('ycsb-execution-output.txt')
+        buf = f.read()
+        latency_bucket = ycsb_parser.parse_latency_bucket(buf, 'read')
+        print latency_bucket
