@@ -18,10 +18,6 @@ case $i in
     BASE_PATH="${i#*=}"
     shift
     ;;
-    --throughput=*)
-    THROUGHPUT="${i#*=}"
-    shift
-    ;;
     --num_records=*)
     NUM_RECORDS="${i#*=}"
     shift
@@ -83,7 +79,6 @@ cat > ${BASE_PATH}/workload.txt <<EOF
 recordcount=${NUM_RECORDS}
 
 # Run YCSB for 300 seconds
-operationcount= $(( 300 * $THROUGHPUT ))
 maxexecutiontime=300
 workload=com.yahoo.ycsb.workloads.CoreWorkload
 
