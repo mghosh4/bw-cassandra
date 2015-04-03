@@ -37,11 +37,10 @@ class YcsbExecuteThread(Thread):
         logger.debug('Running YCSB executor thread at host %s with %d ms delay' % (self.host, self.delay_in_millisec))
         ycsb_path = self.pf.config.get('path', 'ycsb_path')
         src_path = self.pf.config.get('path', 'src_path')
-        target_throughput_command = '--throughput=%d' % self.target_throughput if self.target_throughput is not None else ''
         ret = os.system('ssh %s \'sh %s/ycsb-execute.sh --ycsb_path=%s --base_path=%s '
-                        '%s --host=%s --profile=%s --delay_in_millisec=%d\''
+                        '--throughput=%d --host=%s --profile=%s --delay_in_millisec=%d\''
                         % (self.host, src_path, ycsb_path, self.result_path,
-                           target_throughput_command, self.host, self.pf.get_name(), self.delay_in_millisec))
+                           int(self.target_throughput or 0), self.host, self.pf.get_name(), self.delay_in_millisec))
         self.mutex.acquire()
         self.output.append(ret)
         self.mutex.release()

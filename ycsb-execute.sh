@@ -40,6 +40,14 @@ if [ "emulab" = "$PROFILE" ]; then
 ulimit -n 32768
 fi
 
+if [ "$THROUGHPUT" -eq "0" ]; then
+# Execute YCSB Workload
+${YCSB_PATH}/bin/ycsb run cassandra-cql -s -P ${BASE_PATH}/workload.txt -p warmupexecutiontime=${DELAY_IN_MILLISEC} > ${BASE_PATH}/execution-output-${HOST}.txt
 
+else
 # Execute YCSB Workload
 ${YCSB_PATH}/bin/ycsb run cassandra-cql -s -target ${THROUGHPUT} -P ${BASE_PATH}/workload.txt -p warmupexecutiontime=${DELAY_IN_MILLISEC} > ${BASE_PATH}/execution-output-${HOST}.txt
+
+fi
+
+
