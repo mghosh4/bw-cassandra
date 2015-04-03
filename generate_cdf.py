@@ -1,12 +1,15 @@
 import ConfigParser
 from time import strftime
-import pandas as pd
 import os
-import ycsb_parser
 import re
+
+import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib
 import numpy
+
+from repo.analysis import ycsb_parser
+
 
 data_base_path = '../data'
 

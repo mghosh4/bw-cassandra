@@ -141,6 +141,11 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
         delay_in_millisec -= interval_in_millisec
         sleep(interval_in_millisec * 0.001)
 
+    sleep(30)
+    for host in hosts[0:num_cassandra_nodes]:
+        logger.debug('Open files at host %s' % host)
+        os.system('ssh %s \'sh %s/lsof.sh \'' % (host, src_path))
+
     for t in threads:
         t.join()
 
@@ -178,7 +183,7 @@ def experiment_on_num_cassandra_nodes_with_no_throughput_limit(pf, repeat):
     default_replication_factor = int(pf.config.get('experiment', 'default_replication_factor'))
     hosts = pf.get_hosts()
     for run in range(repeat):
-        for num_cassandra_nodes in range(1, pf.get_max_num_cassandra_nodes() + 1):
+        for num_cassandra_nodes in [1, 5]:
             result = run_experiment(pf,
                                     hosts=hosts,
                                     overall_target_throughput=None,

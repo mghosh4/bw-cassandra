@@ -1,7 +1,8 @@
 from unittest import TestCase
 from StringIO import StringIO
 
-import repo.ycsb_parser as ycsb_parser
+import repo.analysis.ycsb_parser as ycsb_parser
+
 
 __author__ = 'Daniel'
 
