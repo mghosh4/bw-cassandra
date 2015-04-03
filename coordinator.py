@@ -58,9 +58,9 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
 
     result_dir_name = strftime('%m-%d-%H%M')
     result_path = '%s/%s' % (result_base_path, result_dir_name)
-    logger.debug('Executing w/ pf=%s, num_hosts=%d, overall_target_throughput=%d, workload_type=%s, ' \
-                 'num_records=%d, replication_factor=%d, num_cassandra_nodes=%d, result_dir_name=%s' % \
-                 (pf.get_name(), len(hosts), overall_target_throughput, workload_type,
+    logger.debug('Executing w/ pf=%s, num_hosts=%d, overall_target_throughput=%d, workload_type=%s, '
+                 'num_records=%d, replication_factor=%d, num_cassandra_nodes=%d, result_dir_name=%s' %
+                 (pf.get_name(), len(hosts), int(overall_target_throughput or 0), workload_type,
                   num_records, replication_factor, num_cassandra_nodes, result_dir_name))
 
     # Kill cassandra on all hosts
