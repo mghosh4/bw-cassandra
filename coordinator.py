@@ -134,7 +134,7 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
     else:
         target_throughput = None
 
-    for host in hosts[num_cassandra_nodes:]:
+    for host in hosts[num_cassandra_nodes:num_cassandra_nodes + num_ycsb_nodes]:
         current_thread = YcsbExecuteThread(pf, host, target_throughput, result_path, output, mutex, delay_in_millisec)
         threads.append(current_thread)
         current_thread.start()
