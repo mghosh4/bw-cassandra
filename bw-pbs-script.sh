@@ -1,6 +1,6 @@
 #!/bin/bash
-#PBS -l nodes=40:ppn=32:xe
-#PBS -l walltime=5:00:00
+#PBS -l nodes=20:ppn=32:xe
+#PBS -l walltime=20:00:00
 #PBS -l gres=ccm
 ##PBS -j oe
 ##PBS -o /u/sciteam/shin1/scratch/$PBS_JOBID.out

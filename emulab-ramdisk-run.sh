@@ -25,9 +25,9 @@ if [ "\`ulimit -n\`" -eq "1024" ]; then
 cat << FOE >> /etc/security/limits.conf
 
 *    -   memlock  unlimited
-*    -   nofile   1048576
+*    -   nofile   100000
 root    -   memlock  unlimited
-root    -   nofile   1048576
+root    -   nofile   100000
 
 FOE
 fi
