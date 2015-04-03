@@ -209,7 +209,7 @@ def experiment_on_num_ycsb_threads(pf):
                                     workload_type=default_workload_type,
                                     replication_factor=default_replication_factor,
                                     num_cassandra_nodes=num_cassandra_nodes,
-                                    num_ycsb_nodes=len(hosts) - pf.get_max_num_cassandra_nodes(),
+                                    num_ycsb_nodes=15,
                                     num_ycsb_threads=num_ycsb_threads)
 
 def main():
