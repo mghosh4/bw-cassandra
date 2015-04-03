@@ -79,6 +79,8 @@ cat > ${BASE_PATH}/workload.txt <<EOF
 recordcount=${NUM_RECORDS}
 
 # Run YCSB for 300 seconds
+# Safe limit of operation count to accomodate for running 300 seconds with 1M ops/s
+operationcount= 300000000
 maxexecutiontime=300
 workload=com.yahoo.ycsb.workloads.CoreWorkload
 
