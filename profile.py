@@ -98,7 +98,7 @@ class EmulabProfile(BaseProfile):
         return 8
 
     def get_num_ycsb_threads(self):
-        return 500
+        return 250
 
 
 class EmulabRamdiskProfile(EmulabProfile):
