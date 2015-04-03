@@ -48,7 +48,7 @@ class YcsbExecuteThread(Thread):
 
 
 def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_records, replication_factor,
-                   num_cassandra_nodes, num_ycsb_nodes):
+                   num_cassandra_nodes, num_ycsb_nodes, num_ycsb_threads):
     cassandra_path = pf.config.get('path', 'cassandra_path')
     cassandra_home_base_path = pf.config.get('path', 'cassandra_home_base_path')
     ycsb_path = pf.config.get('path', 'ycsb_path')
@@ -89,7 +89,8 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
     logger.debug('Running YCSB load script')
     src_path = pf.config.get('path', 'src_path')
     cassandra_nodes_hosts = ','.join(hosts[0:num_cassandra_nodes])
-    num_ycsb_threads = pf.get_num_ycsb_threads()
+    if num_ycsb_nodes is None:
+        num_ycsb_threads = pf.get_num_ycsb_threads()
     ret = os.system('ssh %s \'sh %s/ycsb-load.sh '
                     '--cassandra_path=%s --ycsb_path=%s '
                     '--base_path=%s --num_records=%d --workload=%s '
@@ -141,10 +142,10 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
         delay_in_millisec -= interval_in_millisec
         sleep(interval_in_millisec * 0.001)
 
-    sleep(30)
-    for host in hosts[0:num_cassandra_nodes]:
-        logger.debug('Open files at host %s' % host)
-        os.system('ssh %s \'sh %s/lsof.sh \'' % (host, src_path))
+    # sleep(30)
+    # for host in hosts[0:num_cassandra_nodes]:
+    #     logger.debug('Open files at host %s' % host)
+    #     os.system('ssh %s \'sh %s/lsof.sh \'' % (host, src_path))
 
     for t in threads:
         t.join()
@@ -194,6 +195,23 @@ def experiment_on_num_cassandra_nodes_with_no_throughput_limit(pf, repeat):
                                     num_ycsb_nodes=len(hosts) - pf.get_max_num_cassandra_nodes())
 
 
+def experiment_on_num_ycsb_threads(pf):
+    default_num_records = int(pf.config.get('experiment', 'default_num_records'))
+    default_workload_type = pf.config.get('experiment', 'default_workload_type')
+    default_replication_factor = int(pf.config.get('experiment', 'default_replication_factor'))
+    hosts = pf.get_hosts()
+    for num_ycsb_threads in range(10, 101, 10):
+        for num_cassandra_nodes in [1, 3, 5]:
+            result = run_experiment(pf,
+                                    hosts=hosts,
+                                    overall_target_throughput=None,
+                                    num_records=default_num_records,
+                                    workload_type=default_workload_type,
+                                    replication_factor=default_replication_factor,
+                                    num_cassandra_nodes=num_cassandra_nodes,
+                                    num_ycsb_nodes=len(hosts) - pf.get_max_num_cassandra_nodes(),
+                                    num_ycsb_threads=num_ycsb_threads)
+
 def main():
     profile_name = sys.argv[1]
     pf = profile.get_profile(profile_name)
@@ -208,8 +226,8 @@ def main():
     # Do all experiments here
     # experiment_on_throughputs(pf, int(pf.config.get('experiment', 'default_num_cassandra_nodes')), repeat)
     # experiment_on_num_cassandra_nodes_and_throughput(pf, repeat)
-    experiment_on_num_cassandra_nodes_with_no_throughput_limit(pf, repeat)
-
+    # experiment_on_num_cassandra_nodes_with_no_throughput_limit(pf, repeat)
+    experiment_on_num_ycsb_threads(pf)
 
     # Copy log to result directory
     os.system('cp %s/bw-cassandra-log.txt %s/' % (pf.get_log_path(), result_base_path))

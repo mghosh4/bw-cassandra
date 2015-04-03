@@ -29,7 +29,7 @@ def plot_throughput_vs_latency():
 
     colors = matplotlib.cm.rainbow(numpy.linspace(0, 1, 8))
     # ['.', ',', 'o', 'v', '^', '<', '>', '1', '2', '3', '4', 's', 'p', '*', 'h', 'H', '+', 'x', 'D', 'd', '|', '_']
-    markers = ['o', '^', 's', 'p', '*', 'h', '+', 'x', 'D', '|', '_']
+    markers = ['o', '^', 's', 'p', 'D', 'h', '+', 'x', '|', '_']
 
     noise_filter_ratio = 0.15
     throughput_range = 300000
@@ -87,6 +87,41 @@ def plot_throughput_vs_latency():
             plt.annotate(label, xy=(x, y), xytext=(-10, 5), textcoords='offset points', size='xx-small')
         plt.legend(loc='best')
         plt.savefig('%s/processed/%s/emulab-%d-nodes-latency-throughput.png' % (data_base_path, output_dir_name, (i + 1)))
+
+    # Plot custom BW and Emulab intermixed plot
+    plt.figure()
+    plt.xlim(0, 150000)
+    plt.ylim(0, latency_range)
+    plt.xlabel('throughput (ops/s)')
+    plt.ylabel('latency (ms)')
+    for i in [0]:
+        cur_df = df[df['profile'] == 'emulab-ramdisk'][df['num_cassandra_nodes'].astype('int') == (i + 1)][df['target_throughput'].astype('float') - df['overall_throughput'].astype('float') < df['target_throughput'].astype('float') * noise_filter_ratio]
+        plt.scatter(x=cur_df['overall_throughput'], y=cur_df['read_average_latency'], c=colors[i], marker=markers[i],
+                    label='emulab %d nodes' % (i + 1))
+    for i in range(0, 1, 1):
+        cur_df = df[df['profile'] == 'bw'][df['num_cassandra_nodes'].astype('int') == (i + 1)][df['target_throughput'].astype('float') - df['overall_throughput'].astype('float') < df['target_throughput'].astype('float') * noise_filter_ratio]
+        plt.scatter(x=cur_df['overall_throughput'], y=cur_df['read_average_latency'], c=colors[7], marker=markers[7],
+                    label='bw %d nodes' % (i + 1))
+    plt.legend(loc='best')
+    plt.savefig('%s/processed/%s/one-nodes-latency-throughput.png' % (data_base_path, output_dir_name))
+
+
+    # Plot custom BW and Emulab intermixed plot
+    plt.figure()
+    plt.xlim(0, 170000)
+    plt.ylim(0, latency_range)
+    plt.xlabel('throughput (ops/s)')
+    plt.ylabel('latency (ms)')
+    for i in [3]:
+        cur_df = df[df['profile'] == 'emulab-ramdisk'][df['num_cassandra_nodes'].astype('int') == (i + 1)][df['target_throughput'].astype('float') - df['overall_throughput'].astype('float') < df['target_throughput'].astype('float') * noise_filter_ratio]
+        plt.scatter(x=cur_df['overall_throughput'], y=cur_df['read_average_latency'], c=colors[i], marker=markers[i],
+                    label='emulab %d nodes' % (i + 1))
+    for i in range(0, 1, 1):
+        cur_df = df[df['profile'] == 'bw'][df['num_cassandra_nodes'].astype('int') == (i + 1)][df['target_throughput'].astype('float') - df['overall_throughput'].astype('float') < df['target_throughput'].astype('float') * noise_filter_ratio]
+        plt.scatter(x=cur_df['overall_throughput'], y=cur_df['read_average_latency'], c=colors[7], marker=markers[7],
+                    label='bw %d nodes' % (i + 1))
+    plt.legend(loc='best')
+    plt.savefig('%s/processed/%s/crossover-latency-throughput.png' % (data_base_path, output_dir_name))
 
 
 def parse_results():
