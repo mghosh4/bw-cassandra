@@ -9,9 +9,6 @@ class BaseProfile(object):
         self.config = ConfigParser.SafeConfigParser()
         pass
 
-    def get_max_allowed_num_ycsb_threads_per_node(self):
-        return 125
-
 class BlueWatersProfile(BaseProfile):
     def __init__(self):
         BaseProfile.__init__(self)
@@ -48,8 +45,14 @@ class BlueWatersProfile(BaseProfile):
     def get_max_num_cassandra_nodes(self):
         return 5
 
+    def get_max_num_ycsb_nodes(self):
+        return 25
+
     def get_total_num_ycsb_threads(self):
         return 500
+
+    def get_max_allowed_num_ycsb_threads_per_node(self):
+        return 125
 
 
 class BlueWatersNetworkProfile(BlueWatersProfile):
@@ -99,8 +102,14 @@ class EmulabProfile(BaseProfile):
     def get_max_num_cassandra_nodes(self):
         return 8
 
+    def get_max_num_ycsb_nodes(self):
+        return 5
+
     def get_total_num_ycsb_threads(self):
         return 500
+
+    def get_max_allowed_num_ycsb_threads_per_node(self):
+        return 1000
 
 
 class EmulabRamdiskProfile(EmulabProfile):

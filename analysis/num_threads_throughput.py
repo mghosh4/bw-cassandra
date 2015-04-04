@@ -20,19 +20,19 @@ def plot_throughput_vs_latency():
     try:
         os.mkdir('%s/processed/%s' % (data_base_path, output_dir_name))
         df.to_csv('%s/processed/%s/data.csv' % (data_base_path, output_dir_name), index=False)
+        df = pd.read_csv('%s/processed/%s/data.csv' % (data_base_path, output_dir_name))
     except:
         pass
 
     df['read_average_latency'] = df['read_average_latency'].apply(lambda x_: float(x_) / 1000.0)
     df['update_average_latency'] = df['update_average_latency'].apply(lambda x_: float(x_) / 1000.0)
 
-
     colors = matplotlib.cm.rainbow(numpy.linspace(0, 1, 7))
     # ['.', ',', 'o', 'v', '^', '<', '>', '1', '2', '3', '4', 's', 'p', '*', 'h', 'H', '+', 'x', 'D', 'd', '|', '_']
     markers = ['o', '^', 's', 'p', 'D', 'h', '+', 'x', '|', '_']
 
-    x_max = 300
-    y_max = 400000
+    x_max = 3000
+    y_max = 500000
 
     plt.figure()
     plt.xlabel('total number of threads')
@@ -48,7 +48,8 @@ def plot_throughput_vs_latency():
     plt.figure()
     plt.xlabel('total number of threads')
     plt.ylabel('read average latency(ms)')
-    plt.xlim(0, x_max)
+    plt.xlim(0, 100)
+    plt.ylim(0, 4)
     filtered_df = df[df['profile'] == 'emulab-ramdisk']
     for idx, (num_cassandra_nodes, group_df) in enumerate(filtered_df.groupby(['num_cassandra_nodes'])):
         plt.scatter(x=group_df['total_num_ycsb_threads'], y=group_df['read_average_latency'], label='emulab %s nodes' % num_cassandra_nodes, marker=markers[idx], color=colors[idx])
@@ -69,7 +70,8 @@ def plot_throughput_vs_latency():
     plt.figure()
     plt.xlabel('total number of threads')
     plt.ylabel('read average latency(ms)')
-    plt.xlim(0, x_max)
+    plt.xlim(0, 100)
+    plt.ylim(0, 1.2)
     filtered_df = df[df['profile'] == 'bw']
     for idx, (num_cassandra_nodes, group_df) in enumerate(filtered_df.groupby(['num_cassandra_nodes'])):
         plt.scatter(x=group_df['total_num_ycsb_threads'], y=group_df['read_average_latency'], label='bw %s nodes' % num_cassandra_nodes, marker=markers[idx], color=colors[idx])

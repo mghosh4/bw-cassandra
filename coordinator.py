@@ -129,8 +129,9 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
 
     # Run YCSB executor threads in parallel at each host
     logger.debug('Running YCSB execute workload at each host in parallel...')
-    base_warmup_time_in_millisec = 0
-    interval_in_millisec = 10000
+    base_warmup_time_in_millisec = 5000
+    # Delay rate : 3 seconds / 100 threads
+    interval_in_millisec = num_ycsb_threads * 30
     delay_in_millisec = num_ycsb_nodes * interval_in_millisec + base_warmup_time_in_millisec
 
     if overall_target_throughput is not None:
@@ -203,13 +204,15 @@ def experiment_on_num_ycsb_threads(pf):
     default_workload_type = pf.config.get('experiment', 'default_workload_type')
     default_replication_factor = int(pf.config.get('experiment', 'default_replication_factor'))
     hosts = pf.get_hosts()
-    for num_cassandra_nodes in [1, 3, 5, 7, 9, 11, 13, 15]:
-        for total_num_ycsb_threads in range(20, 500, 20):
-            if total_num_ycsb_threads > num_cassandra_nodes * 100:
-                continue
-
+    for num_cassandra_nodes in [1, 5, 10, 15]:
+        num_threads_lower_bound = num_cassandra_nodes * 100 + 1
+        num_threads_high_bound = num_cassandra_nodes * 300 + 1
+        for total_num_ycsb_threads in range(num_threads_lower_bound, num_threads_high_bound, (num_threads_high_bound - num_threads_lower_bound) / 10):
             num_ycsb_nodes = total_num_ycsb_threads / pf.get_max_allowed_num_ycsb_threads_per_node() + 1
-            assert num_ycsb_nodes <= 5
+            logger.debug('num_cassandra_nodes=%d, total_num_ycsb_threads=%d, num_ycsb_nodes=%d' % (num_cassandra_nodes, total_num_ycsb_threads, num_ycsb_nodes))
+            if num_ycsb_nodes > pf.get_max_num_ycsb_nodes():
+                logger.debug('%d exceeds number of allowed ycsb nodes of %d...' % (num_ycsb_nodes, pf.get_max_num_ycsb_nodes()))
+                continue
             result = run_experiment(pf,
                                     hosts=hosts,
                                     overall_target_throughput=None,
