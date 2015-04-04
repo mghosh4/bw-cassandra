@@ -31,9 +31,14 @@ def plot_throughput_vs_latency():
     # ['.', ',', 'o', 'v', '^', '<', '>', '1', '2', '3', '4', 's', 'p', '*', 'h', 'H', '+', 'x', 'D', 'd', '|', '_']
     markers = ['o', '^', 's', 'p', 'D', 'h', '+', 'x', '|', '_']
 
+    x_max = 300
+    y_max = 400000
+
     plt.figure()
     plt.xlabel('total number of threads')
     plt.ylabel('throughput (ops/s)')
+    plt.xlim(0, x_max)
+    plt.ylim(0, 150000)
     filtered_df = df[df['profile'] == 'emulab-ramdisk']
     for idx, (num_cassandra_nodes, group_df) in enumerate(filtered_df.groupby(['num_cassandra_nodes'])):
         plt.scatter(x=group_df['total_num_ycsb_threads'], y=group_df['overall_throughput'], label='emulab %s nodes' % num_cassandra_nodes, marker=markers[idx], color=colors[idx])
@@ -43,6 +48,7 @@ def plot_throughput_vs_latency():
     plt.figure()
     plt.xlabel('total number of threads')
     plt.ylabel('read average latency(ms)')
+    plt.xlim(0, x_max)
     filtered_df = df[df['profile'] == 'emulab-ramdisk']
     for idx, (num_cassandra_nodes, group_df) in enumerate(filtered_df.groupby(['num_cassandra_nodes'])):
         plt.scatter(x=group_df['total_num_ycsb_threads'], y=group_df['read_average_latency'], label='emulab %s nodes' % num_cassandra_nodes, marker=markers[idx], color=colors[idx])
@@ -52,6 +58,8 @@ def plot_throughput_vs_latency():
     plt.figure()
     plt.xlabel('total number of threads')
     plt.ylabel('throughput (ops/s)')
+    plt.xlim(0, x_max)
+    plt.ylim(0, y_max)
     filtered_df = df[df['profile'] == 'bw']
     for idx, (num_cassandra_nodes, group_df) in enumerate(filtered_df.groupby(['num_cassandra_nodes'])):
         plt.scatter(x=group_df['total_num_ycsb_threads'], y=group_df['overall_throughput'], label='bw %s nodes' % num_cassandra_nodes, marker=markers[idx], color=colors[idx])
@@ -61,6 +69,7 @@ def plot_throughput_vs_latency():
     plt.figure()
     plt.xlabel('total number of threads')
     plt.ylabel('read average latency(ms)')
+    plt.xlim(0, x_max)
     filtered_df = df[df['profile'] == 'bw']
     for idx, (num_cassandra_nodes, group_df) in enumerate(filtered_df.groupby(['num_cassandra_nodes'])):
         plt.scatter(x=group_df['total_num_ycsb_threads'], y=group_df['read_average_latency'], label='bw %s nodes' % num_cassandra_nodes, marker=markers[idx], color=colors[idx])

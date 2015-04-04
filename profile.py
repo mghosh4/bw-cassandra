@@ -9,6 +9,8 @@ class BaseProfile(object):
         self.config = ConfigParser.SafeConfigParser()
         pass
 
+    def get_max_allowed_num_ycsb_threads_per_node(self):
+        return 125
 
 class BlueWatersProfile(BaseProfile):
     def __init__(self):

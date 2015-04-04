@@ -203,10 +203,13 @@ def experiment_on_num_ycsb_threads(pf):
     default_workload_type = pf.config.get('experiment', 'default_workload_type')
     default_replication_factor = int(pf.config.get('experiment', 'default_replication_factor'))
     hosts = pf.get_hosts()
-    for num_cassandra_nodes in [1, 3, 5, 7]:
-        for total_num_ycsb_threads in range(25, 500, 25):
-            if total_num_ycsb_threads > num_cassandra_nodes * 75:
+    for num_cassandra_nodes in [1, 3, 5, 7, 9, 11, 13, 15]:
+        for total_num_ycsb_threads in range(20, 500, 20):
+            if total_num_ycsb_threads > num_cassandra_nodes * 100:
                 continue
+
+            num_ycsb_nodes = total_num_ycsb_threads / pf.get_max_allowed_num_ycsb_threads_per_node() + 1
+            assert num_ycsb_nodes <= 5
             result = run_experiment(pf,
                                     hosts=hosts,
                                     overall_target_throughput=None,
@@ -214,7 +217,7 @@ def experiment_on_num_ycsb_threads(pf):
                                     workload_type=default_workload_type,
                                     replication_factor=default_replication_factor,
                                     num_cassandra_nodes=num_cassandra_nodes,
-                                    num_ycsb_nodes=1,
+                                    num_ycsb_nodes=num_ycsb_nodes,
                                     total_num_ycsb_threads=total_num_ycsb_threads)
 
 
