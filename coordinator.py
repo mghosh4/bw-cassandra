@@ -1,4 +1,3 @@
-from functools import total_ordering
 import os
 from time import strftime, sleep
 import ConfigParser

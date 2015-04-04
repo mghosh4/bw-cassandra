@@ -13,8 +13,8 @@ data_base_path = '../../data/max_throughput_vary_threads'
 
 def plot_throughput_vs_latency():
 
-    # df = parse_results()
-    df = read_most_recent_csv_into_dataframe()
+    df = parse_results()
+    # df = read_most_recent_csv_into_dataframe()
 
     output_dir_name = strftime('%m-%d-%H%M')
     try:
@@ -91,10 +91,10 @@ def parse_results():
                         except Exception, e:
                             print str(e)
                             continue
+                        print fname
                         if result is None:
                             result = cur_result
                         else:
-                            print fname
                             new_result = dict()
                             new_result['update_num_operations'] = result['update_num_operations'] + cur_result['update_num_operations']
                             new_result['read_num_operations'] = result['read_num_operations'] + cur_result['read_num_operations']
