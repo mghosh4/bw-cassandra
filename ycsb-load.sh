@@ -105,4 +105,4 @@ histogram.buckets=10000
 EOF
 
 # Load YCSB Workload
-${YCSB_PATH}/bin/ycsb load cassandra-cql -s -P ${BASE_PATH}/workload.txt > ${BASE_PATH}/load-output.txt
+${YCSB_PATH}/bin/ycsb load cassandra-cql -s -P ${BASE_PATH}/workload.txt -p maxexecutiontime=600 > ${BASE_PATH}/load-output.txt

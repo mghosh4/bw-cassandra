@@ -43,16 +43,16 @@ class BlueWatersProfile(BaseProfile):
         return range(interval, heuristic_max_throughput, interval)
 
     def get_max_num_cassandra_nodes(self):
-        return 5
+        return 15
 
     def get_max_num_ycsb_nodes(self):
         return 25
 
-    def get_total_num_ycsb_threads(self):
-        return 500
-
     def get_max_allowed_num_ycsb_threads_per_node(self):
         return 125
+
+    def get_max_num_connections_per_cassandra_node(self):
+        return 128  # 8 connections per core (according to Solving Big Data Challenges paper)
 
 
 class BlueWatersNetworkProfile(BlueWatersProfile):
@@ -100,16 +100,16 @@ class EmulabProfile(BaseProfile):
         return range(interval, heuristic_max_throughput, interval)
 
     def get_max_num_cassandra_nodes(self):
-        return 8
+        return 15
 
     def get_max_num_ycsb_nodes(self):
         return 5
 
-    def get_total_num_ycsb_threads(self):
-        return 500
-
     def get_max_allowed_num_ycsb_threads_per_node(self):
-        return 1000
+        return 250
+
+    def get_max_num_connections_per_cassandra_node(self):
+        return 32  # 8 connections per core (according to Solving Big Data Challenges paper)
 
 
 class EmulabRamdiskProfile(EmulabProfile):
