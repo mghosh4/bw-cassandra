@@ -13,8 +13,8 @@ data_base_path = '../../data/max_throughput_vary_threads'
 
 def plot_throughput_vs_latency():
 
-    df = parse_results()
-    # df = read_most_recent_csv_into_dataframe()
+    # df = parse_results()
+    df = read_most_recent_csv_into_dataframe()
 
     output_dir_name = strftime('%m-%d-%H%M')
     try:
@@ -42,12 +42,30 @@ def plot_throughput_vs_latency():
 
     plt.figure()
     plt.xlabel('total number of threads')
+    plt.ylabel('read average latency(ms)')
+    filtered_df = df[df['profile'] == 'emulab-ramdisk']
+    for idx, (num_cassandra_nodes, group_df) in enumerate(filtered_df.groupby(['num_cassandra_nodes'])):
+        plt.scatter(x=group_df['total_num_ycsb_threads'], y=group_df['read_average_latency'], label='emulab %s nodes' % num_cassandra_nodes, marker=markers[idx], color=colors[idx])
+    plt.legend(loc='best')
+    plt.savefig('%s/processed/%s/emulab-num-threads-vs-latency.png' % (data_base_path, output_dir_name))
+
+    plt.figure()
+    plt.xlabel('total number of threads')
     plt.ylabel('throughput (ops/s)')
     filtered_df = df[df['profile'] == 'bw']
     for idx, (num_cassandra_nodes, group_df) in enumerate(filtered_df.groupby(['num_cassandra_nodes'])):
         plt.scatter(x=group_df['total_num_ycsb_threads'], y=group_df['overall_throughput'], label='bw %s nodes' % num_cassandra_nodes, marker=markers[idx], color=colors[idx])
     plt.legend(loc='best')
     plt.savefig('%s/processed/%s/bw-num-threads-vs-throughput.png' % (data_base_path, output_dir_name))
+
+    plt.figure()
+    plt.xlabel('total number of threads')
+    plt.ylabel('read average latency(ms)')
+    filtered_df = df[df['profile'] == 'bw']
+    for idx, (num_cassandra_nodes, group_df) in enumerate(filtered_df.groupby(['num_cassandra_nodes'])):
+        plt.scatter(x=group_df['total_num_ycsb_threads'], y=group_df['read_average_latency'], label='bw %s nodes' % num_cassandra_nodes, marker=markers[idx], color=colors[idx])
+    plt.legend(loc='best')
+    plt.savefig('%s/processed/%s/bw-num-threads-vs-latency.png' % (data_base_path, output_dir_name))
 
 
 def parse_results():
@@ -96,11 +114,10 @@ def parse_results():
                 config_dict['result_dir_name'] = dir_name
                 result.update(config_dict)
 
-                if not meta.has_option('config', 'num_ycsb_threads'):
+                if not meta.has_option('config', 'total_num_ycsb_threads'):
                     workload_f = open('%s/workload.txt' % cur_dir_path)
                     num_ycsb_threads = int(filter(lambda x: 'threadcount' in x, workload_f.read().splitlines())[0].split('=')[1])
                     total_num_ycsb_threads = num_ycsb_threads * int(meta.get('config', 'num_ycsb_nodes'))
-                    result['num_ycsb_threads'] = num_ycsb_threads
                     result['total_num_ycsb_threads'] = total_num_ycsb_threads
 
                 rows.append(result)
