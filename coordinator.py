@@ -48,7 +48,7 @@ class YcsbExecuteThread(Thread):
 
 
 def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_records, replication_factor,
-                   num_cassandra_nodes, num_ycsb_nodes, num_ycsb_threads):
+                   num_cassandra_nodes, num_ycsb_nodes, total_num_ycsb_threads):
     cassandra_path = pf.config.get('path', 'cassandra_path')
     cassandra_home_base_path = pf.config.get('path', 'cassandra_home_base_path')
     ycsb_path = pf.config.get('path', 'ycsb_path')
@@ -58,9 +58,10 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
     result_dir_name = strftime('%m-%d-%H%M')
     result_path = '%s/%s' % (result_base_path, result_dir_name)
     logger.debug('Executing w/ pf=%s, num_hosts=%d, overall_target_throughput=%d, workload_type=%s, '
-                 'num_records=%d, replication_factor=%d, num_cassandra_nodes=%d, result_dir_name=%s' %
-                 (pf.get_name(), len(hosts), int(overall_target_throughput or 0), workload_type,
-                  num_records, replication_factor, num_cassandra_nodes, result_dir_name))
+                 'num_records=%d, replication_factor=%d, num_cassandra_nodes=%d, result_dir_name=%s, '
+                 'total_num_ycsb_threads=%d' %
+                 (pf.get_name(), len(hosts), int(overall_target_throughput or -1), workload_type,
+                  num_records, replication_factor, num_cassandra_nodes, result_dir_name, int(total_num_ycsb_threads or -1)))
 
     # Kill cassandra on all hosts
     for host in hosts:
@@ -89,8 +90,9 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
     logger.debug('Running YCSB load script')
     src_path = pf.config.get('path', 'src_path')
     cassandra_nodes_hosts = ','.join(hosts[0:num_cassandra_nodes])
-    if num_ycsb_nodes is None:
-        num_ycsb_threads = pf.get_num_ycsb_threads()
+    if total_num_ycsb_threads is None:
+        total_num_ycsb_threads = pf.get_total_num_ycsb_threads()
+    num_ycsb_threads = total_num_ycsb_threads / num_ycsb_nodes
     ret = os.system('ssh %s \'sh %s/ycsb-load.sh '
                     '--cassandra_path=%s --ycsb_path=%s '
                     '--base_path=%s --num_records=%d --workload=%s '
@@ -113,6 +115,7 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
     meta.set('config', 'replication_factor', replication_factor)
     meta.set('config', 'num_cassandra_nodes', num_cassandra_nodes)
     meta.set('config', 'num_ycsb_nodes', num_ycsb_nodes)
+    meta.set('config', 'total_num_ycsb_threads', total_num_ycsb_threads)
     meta.set('config', 'result_dir_name', result_dir_name)
     meta_file = open('%s/meta.ini' % result_path, 'w')
     meta.write(meta_file)
@@ -200,8 +203,8 @@ def experiment_on_num_ycsb_threads(pf):
     default_workload_type = pf.config.get('experiment', 'default_workload_type')
     default_replication_factor = int(pf.config.get('experiment', 'default_replication_factor'))
     hosts = pf.get_hosts()
-    for num_ycsb_threads in range(10, 101, 10):
-        for num_cassandra_nodes in [1, 3, 5]:
+    for num_cassandra_nodes in [1, 3, 5, 7]:
+        for total_num_ycsb_threads in range(25, 500, 50):
             result = run_experiment(pf,
                                     hosts=hosts,
                                     overall_target_throughput=None,
@@ -209,8 +212,9 @@ def experiment_on_num_ycsb_threads(pf):
                                     workload_type=default_workload_type,
                                     replication_factor=default_replication_factor,
                                     num_cassandra_nodes=num_cassandra_nodes,
-                                    num_ycsb_nodes=15,
-                                    num_ycsb_threads=num_ycsb_threads)
+                                    num_ycsb_nodes=1,
+                                    total_num_ycsb_threads=total_num_ycsb_threads)
+
 
 def main():
     profile_name = sys.argv[1]

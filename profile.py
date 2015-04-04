@@ -46,8 +46,8 @@ class BlueWatersProfile(BaseProfile):
     def get_max_num_cassandra_nodes(self):
         return 5
 
-    def get_num_ycsb_threads(self):
-        return 100
+    def get_total_num_ycsb_threads(self):
+        return 500
 
 
 class BlueWatersNetworkProfile(BlueWatersProfile):
@@ -97,8 +97,8 @@ class EmulabProfile(BaseProfile):
     def get_max_num_cassandra_nodes(self):
         return 8
 
-    def get_num_ycsb_threads(self):
-        return 250
+    def get_total_num_ycsb_threads(self):
+        return 500
 
 
 class EmulabRamdiskProfile(EmulabProfile):
