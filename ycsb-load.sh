@@ -81,7 +81,7 @@ recordcount=${NUM_RECORDS}
 # Run YCSB for 100 seconds
 # Safe limit of operation count to accomodate for running 300 seconds with 1M ops/s
 operationcount= 300000000
-maxexecutiontime=100
+maxexecutiontime=60
 workload=com.yahoo.ycsb.workloads.CoreWorkload
 
 readallfields=true

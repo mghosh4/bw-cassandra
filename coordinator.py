@@ -1,3 +1,4 @@
+from functools import total_ordering
 import os
 from time import strftime, sleep
 import ConfigParser
@@ -129,7 +130,7 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, num_reco
 
     # Run YCSB executor threads in parallel at each host
     logger.debug('Running YCSB execute workload at each host in parallel...')
-    base_warmup_time_in_millisec = 10000
+    base_warmup_time_in_millisec = 0
     interval_in_millisec = 10000
     delay_in_millisec = num_ycsb_nodes * interval_in_millisec + base_warmup_time_in_millisec
 
@@ -204,7 +205,9 @@ def experiment_on_num_ycsb_threads(pf):
     default_replication_factor = int(pf.config.get('experiment', 'default_replication_factor'))
     hosts = pf.get_hosts()
     for num_cassandra_nodes in [1, 3, 5, 7]:
-        for total_num_ycsb_threads in range(25, 500, 50):
+        for total_num_ycsb_threads in range(25, 500, 25):
+            if total_num_ycsb_threads > num_cassandra_nodes * 75:
+                continue
             result = run_experiment(pf,
                                     hosts=hosts,
                                     overall_target_throughput=None,
