@@ -165,19 +165,27 @@ def experiment_on_throughputs(pf, num_cassandra_nodes, repeat):
     target_throughputs = pf.get_heuristic_target_throughputs(num_cassandra_nodes)
 
     for run in range(repeat):
-        for throughput in target_throughputs:
+        for target_throughput in target_throughputs:
+            total_num_ycsb_threads = pf.get_max_num_connections_per_cassandra_node() * num_cassandra_nodes
+            total_num_records = default_num_records * num_cassandra_nodes
+            num_ycsb_nodes = total_num_ycsb_threads / pf.get_max_allowed_num_ycsb_threads_per_node() + 1
+            logger.debug('num_cassandra_nodes=%d, total_num_ycsb_threads=%d, num_ycsb_nodes=%d, total_num_records=%d'
+                         % (num_cassandra_nodes, total_num_ycsb_threads, num_ycsb_nodes, total_num_records))
+
             result = run_experiment(pf,
                                     hosts=pf.get_hosts(),
-                                    overall_target_throughput=throughput,
-                                    total_num_records=default_num_records,
+                                    overall_target_throughput=target_throughput,
+                                    total_num_records=default_num_records * num_cassandra_nodes,
                                     workload_type=default_workload_type,
                                     replication_factor=default_replication_factor,
-                                    num_cassandra_nodes=num_cassandra_nodes)
+                                    num_cassandra_nodes=num_cassandra_nodes,
+                                    num_ycsb_nodes=num_ycsb_nodes,
+                                    total_num_ycsb_threads=total_num_ycsb_threads)
 
 
 def experiment_on_num_cassandra_nodes_and_throughput(pf, repeat):
     for run in range(repeat):
-        for num_cassandra_nodes in range(1, pf.get_max_num_cassandra_nodes() + 1):
+        for num_cassandra_nodes in range(1, pf.get_max_num_cassandra_nodes() + 1, 4):
             experiment_on_throughputs(pf, num_cassandra_nodes, 1)
 
 
@@ -261,10 +269,10 @@ def main():
 
     # Do all experiments here
     # experiment_on_throughputs(pf, int(pf.config.get('experiment', 'default_num_cassandra_nodes')), repeat)
-    # experiment_on_num_cassandra_nodes_and_throughput(pf, repeat)
+    experiment_on_num_cassandra_nodes_and_throughput(pf, repeat)
     # experiment_on_num_cassandra_nodes_with_no_throughput_limit(pf, repeat)
     # experiment_on_num_ycsb_threads(pf)
-    experiment_on_latency_scalability(pf)
+    # experiment_on_latency_scalability(pf)
 
     # Copy log to result directory
     os.system('cp %s/bw-cassandra-log.txt %s/' % (pf.get_log_path(), result_base_path))

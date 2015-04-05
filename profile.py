@@ -34,13 +34,13 @@ class BlueWatersProfile(BaseProfile):
         return '/u/sciteam/shin1/scratch'
 
     def get_heuristic_target_throughputs(self, num_cassandra_nodes):
-        interval = 25000
-        single_node_throughput = 130000
-        throughput_delta_for_added_node = 50000
-        safety_ratio = 1.2
+        single_node_throughput = 100000
+        throughput_delta_for_added_node = 100000
+        safety_ratio = 2.0
 
         heuristic_max_throughput = int((single_node_throughput + (num_cassandra_nodes - 1) * throughput_delta_for_added_node) * safety_ratio)
-        return range(interval, heuristic_max_throughput, interval)
+        measurement_interval = heuristic_max_throughput / 10
+        return range(measurement_interval, heuristic_max_throughput, measurement_interval)
 
     def get_max_num_cassandra_nodes(self):
         return 15
@@ -91,13 +91,13 @@ class EmulabProfile(BaseProfile):
         return '/tmp'
 
     def get_heuristic_target_throughputs(self, num_cassandra_nodes):
-        interval = 15000
-        single_node_throughput = 50000
-        throughput_delta_for_added_node = 40000
-        safety_ratio = 1.4
+        single_node_throughput = 15000
+        throughput_delta_for_added_node = 15000
+        safety_ratio = 2.0
 
         heuristic_max_throughput = int((single_node_throughput + (num_cassandra_nodes - 1) * throughput_delta_for_added_node) * safety_ratio)
-        return range(interval, heuristic_max_throughput, interval)
+        measurement_interval = heuristic_max_throughput / 10
+        return range(measurement_interval, heuristic_max_throughput, measurement_interval)
 
     def get_max_num_cassandra_nodes(self):
         return 15
