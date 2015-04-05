@@ -100,10 +100,10 @@ class EmulabProfile(BaseProfile):
         return range(measurement_interval, heuristic_max_throughput, measurement_interval)
 
     def get_max_num_cassandra_nodes(self):
-        return 15
+        return 17
 
     def get_max_num_ycsb_nodes(self):
-        return 5
+        return 3
 
     def get_max_allowed_num_ycsb_threads_per_node(self):
         return 250
