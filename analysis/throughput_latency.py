@@ -33,7 +33,7 @@ def plot_throughput_vs_latency():
 
     noise_filter_ratio = 0.15
     throughput_range = 300000
-    latency_range = 15
+    latency_range = 50
     # Plot BW-ramdisk for varying number of nodes
     plt.figure()
     plt.xlim(0, throughput_range)
@@ -92,36 +92,36 @@ def plot_throughput_vs_latency():
     plt.figure()
     plt.xlim(0, 150000)
     plt.ylim(0, latency_range)
-    plt.xlabel('throughput (ops/s)')
-    plt.ylabel('latency (ms)')
+    plt.xlabel('Throughput (ops/s)')
+    plt.ylabel('Average read latency (ms)')
     for i in [0]:
-        cur_df = df[df['profile'] == 'emulab-ramdisk'][df['num_cassandra_nodes'].astype('int') == (i + 1)][df['target_throughput'].astype('float') - df['overall_throughput'].astype('float') < df['target_throughput'].astype('float') * noise_filter_ratio]
+        # cur_df = df[df['profile'] == 'emulab-ramdisk'][df['num_cassandra_nodes'].astype('int') == (i + 1)][df['target_throughput'].astype('float') - df['overall_throughput'].astype('float') < df['target_throughput'].astype('float') * noise_filter_ratio]
+        cur_df = df[df['profile'] == 'emulab-ramdisk'][df['num_cassandra_nodes'].astype('int') == (i + 1)]
         plt.scatter(x=cur_df['overall_throughput'], y=cur_df['read_average_latency'], c=colors[i], marker=markers[i],
-                    label='emulab %d nodes' % (i + 1))
+                    label='emulab %d node' % (i + 1))
     for i in range(0, 1, 1):
         cur_df = df[df['profile'] == 'bw'][df['num_cassandra_nodes'].astype('int') == (i + 1)][df['target_throughput'].astype('float') - df['overall_throughput'].astype('float') < df['target_throughput'].astype('float') * noise_filter_ratio]
         plt.scatter(x=cur_df['overall_throughput'], y=cur_df['read_average_latency'], c=colors[7], marker=markers[7],
-                    label='bw %d nodes' % (i + 1))
+                    label='bw %d node' % (i + 1))
     plt.legend(loc='best')
     plt.savefig('%s/processed/%s/one-nodes-latency-throughput.png' % (data_base_path, output_dir_name))
 
 
-    # Plot custom BW and Emulab intermixed plot
+    # Plot custom unstable plot
     plt.figure()
-    plt.xlim(0, 170000)
+    plt.xlim(0, 150000)
     plt.ylim(0, latency_range)
-    plt.xlabel('throughput (ops/s)')
-    plt.ylabel('latency (ms)')
+    plt.xlabel('Throughput (ops/s)')
+    plt.ylabel('Average read latency (ms)')
     for i in [3]:
-        cur_df = df[df['profile'] == 'emulab-ramdisk'][df['num_cassandra_nodes'].astype('int') == (i + 1)][df['target_throughput'].astype('float') - df['overall_throughput'].astype('float') < df['target_throughput'].astype('float') * noise_filter_ratio]
+        # cur_df = df[df['profile'] == 'emulab-ramdisk'][df['num_cassandra_nodes'].astype('int') == (i + 1)][df['target_throughput'].astype('float') - df['overall_throughput'].astype('float') < df['target_throughput'].astype('float') * noise_filter_ratio]
+        cur_df = df[df['profile'] == 'emulab-ramdisk'][df['num_cassandra_nodes'].astype('int') == (i + 1)]
         plt.scatter(x=cur_df['overall_throughput'], y=cur_df['read_average_latency'], c=colors[i], marker=markers[i],
                     label='emulab %d nodes' % (i + 1))
-    for i in range(0, 1, 1):
-        cur_df = df[df['profile'] == 'bw'][df['num_cassandra_nodes'].astype('int') == (i + 1)][df['target_throughput'].astype('float') - df['overall_throughput'].astype('float') < df['target_throughput'].astype('float') * noise_filter_ratio]
-        plt.scatter(x=cur_df['overall_throughput'], y=cur_df['read_average_latency'], c=colors[7], marker=markers[7],
-                    label='bw %d nodes' % (i + 1))
+        for label, x, y in zip(cur_df['target_throughput'], cur_df['overall_throughput'], cur_df['read_average_latency']):
+            plt.annotate(label, xy=(x, y), xytext=(-10, 5), textcoords='offset points', size='xx-small')
     plt.legend(loc='best')
-    plt.savefig('%s/processed/%s/crossover-latency-throughput.png' % (data_base_path, output_dir_name))
+    plt.savefig('%s/processed/%s/unstable-latency-throughput.png' % (data_base_path, output_dir_name))
 
 
 def parse_results():

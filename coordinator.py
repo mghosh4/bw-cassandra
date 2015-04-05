@@ -59,9 +59,10 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, total_nu
     result_path = '%s/%s' % (result_base_path, result_dir_name)
     logger.debug('Executing w/ pf=%s, num_hosts=%d, overall_target_throughput=%d, workload_type=%s, '
                  'num_records=%d, replication_factor=%d, num_cassandra_nodes=%d, result_dir_name=%s, '
-                 'total_num_ycsb_threads=%d' %
+                 'num_ycsb_nodes=%d, total_num_ycsb_threads=%d' %
                  (pf.get_name(), len(hosts), int(overall_target_throughput or -1), workload_type,
-                  total_num_records, replication_factor, num_cassandra_nodes, result_dir_name, int(total_num_ycsb_threads or -1)))
+                  total_num_records, replication_factor, num_cassandra_nodes, result_dir_name,
+                  num_ycsb_nodes, total_num_ycsb_threads))
 
     assert num_cassandra_nodes <= pf.get_max_num_cassandra_nodes()
     assert num_ycsb_nodes <= pf.get_max_num_ycsb_nodes()
@@ -85,15 +86,11 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, total_nu
                         (cassandra_path, cassandra_home, seed_host, host, java_path))
         sleep(15)
 
-    if num_ycsb_nodes is None:
-        num_ycsb_nodes = len(hosts) - num_cassandra_nodes
-
     # Running YCSB load script
     logger.debug('Running YCSB load script')
     src_path = pf.config.get('path', 'src_path')
     cassandra_nodes_hosts = ','.join(hosts[0:num_cassandra_nodes])
-    if total_num_ycsb_threads is None:
-        total_num_ycsb_threads = pf.get_total_num_ycsb_threads()
+
     num_ycsb_threads = total_num_ycsb_threads / num_ycsb_nodes
     ret = os.system('ssh %s \'sh %s/ycsb-load.sh '
                     '--cassandra_path=%s --ycsb_path=%s '

@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -l nodes=32:ppn=32:xe
+#PBS -l nodes=35:ppn=32:xe
 #PBS -l walltime=10:00:00
 #PBS -l gres=ccm
 ##PBS -j oe
