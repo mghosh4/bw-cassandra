@@ -35,9 +35,6 @@ class BlueWatersProfile(BaseProfile):
     def get_name(self):
         return 'bw'
 
-    def get_log_path(self):
-        return '/u/sciteam/shin1/scratch/log'
-
     def get_heuristic_target_throughputs(self, num_cassandra_nodes):
         single_node_throughput = 100000
         throughput_delta_for_added_node = 100000

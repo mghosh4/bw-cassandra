@@ -397,7 +397,7 @@ def main():
     experiment_on_pbs(pf, repeat)
 
     # Copy log to result directory
-    os.system('cp %s/bw-cassandra-log-%s.txt %s/bw-cassandra-log.txt' % (pf.get_log_path(), job_id, result_base_path))
+    os.system('cp %s/bw-cassandra-log-%s.txt %s/bw-cassandra-log.txt' % (pf.config.get('path', 'log_path'), job_id, result_base_path))
 
     # Archive the result and send to remote server
     os.system('tar -czf /tmp/%s -C %s .'

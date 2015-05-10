@@ -35,10 +35,12 @@ fi
 
 EOF
 
+JOBID=`date +%m-%d-%H%M`
 
 sudo -u root bash <<EOF
 
+
 # Execute coordinator with emulab profile
-python /proj/ISS/shin14/bw-cassandra/bw-cassandra/coordinator.py emulab 2>&1 | tee /tmp/bw-cassandra-log.txt
+python /proj/ISS/shin14/bw-cassandra/bw-cassandra/coordinator.py emulab ${JOBID} 2>&1 | tee /tmp/bw-cassandra-log-${JOBID}.txt
 
 EOF
