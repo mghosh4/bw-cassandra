@@ -7,6 +7,7 @@ import sys
 import profile
 import logging
 import subprocess
+import math
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s: '
@@ -369,7 +370,7 @@ def experiment_on_pbs(pf, repeat):
     for i in range(repeat):
         total_num_ycsb_threads = pf.get_max_num_connections_per_cassandra_node() * num_cassandra_nodes
         total_num_records = num_records * num_cassandra_nodes
-        num_ycsb_nodes = total_num_ycsb_threads / pf.get_max_allowed_num_ycsb_threads_per_node() + 1
+        num_ycsb_nodes = int(math.ceil(total_num_ycsb_threads / pf.get_max_allowed_num_ycsb_threads_per_node()))
         logger.debug('Experiment on pbs')
 
         result = run_experiment(pf,
