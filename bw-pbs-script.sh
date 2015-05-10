@@ -4,8 +4,8 @@
 #PBS -l gres=ccm
 ##PBS -j oe
 ##PBS -o /u/sciteam/shin1/scratch/$PBS_JOBID.out
-#PBS -e $PBS_JOBID.err
-#PBS -o $PBS_JOBID.out
+#PBS -e /u/sciteam/shin1/scratch/log/$PBS_JOBID.err
+#PBS -o /u/sciteam/shin1/scratch/log/$PBS_JOBID.out
 #PBS -m bea
 #PBS -M shin14@illinois.edu
 
