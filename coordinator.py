@@ -239,7 +239,7 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, total_nu
             logger.debug('elapsed_time_in_ms:%d, %s' % (elapsed_time_in_ms, line))
             prob = float(line.split()[4])
             pbs_probs.append(prob)
-        meta.set('result', str(pbs_probs))
+        meta.set('result', 'pbs_probabilities', str(pbs_probs))
 
     meta_file = open('%s/meta.ini' % result_path, 'w')
     meta.write(meta_file)
