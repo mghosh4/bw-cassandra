@@ -55,7 +55,8 @@ bash -c "cat > ${CASSANDRA_HOME}/cassandra/conf/cassandra.yaml" <<-EOF
     num_tokens: 256
     initial_token:
     hinted_handoff_enabled: true
-    max_hint_window_in_ms: 10800000 hinted_handoff_throttle_in_kb: 1024
+    max_hint_window_in_ms: 10800000
+    hinted_handoff_throttle_in_kb: 1024
     max_hints_delivery_threads: 2
     authenticator: AllowAllAuthenticator
     authorizer: AllowAllAuthorizer
