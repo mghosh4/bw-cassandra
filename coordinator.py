@@ -236,6 +236,7 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, total_nu
                     stdout=subprocess.PIPE)
 
             line = proc.stdout.readline()
+            logger.debug('elapsed_time_in_ms:%d, %s' % (elapsed_time_in_ms, line))
             prob = float(line.split()[4])
             pbs_probs.append(prob)
         meta.set('result', str(pbs_probs))
