@@ -61,7 +61,7 @@ for profile_name in ['bw', 'emulab']:
                             profile_dicts[profile_name][rw][key] += value
                         else:
                             profile_dicts[profile_name][rw][key] = value
-                            
+
 
 for profile_name in profile_dicts.keys():
     aggregate_dicts = profile_dicts[profile_name]
