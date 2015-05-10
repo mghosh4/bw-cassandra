@@ -136,25 +136,19 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, total_nu
     sleep(10)
 
     logger.debug('Cassandra deploy threads finished with outputs: %s...' % output)
-    proc = subprocess.Popen(
-        ['ssh', seed_host, '%s/bin/nodetool status -h %s | grep rack' % (cassandra_path, seed_host)],
-        stdout=subprocess.PIPE)
+    stdout = subprocess.check_output('ssh %s %s/bin/nodetool status -h %s | grep rack' %
+                                     (seed_host, cassandra_path, seed_host), shell=True)
     host_statuses = {}
     hosts_down = False
-    while True:
-        line = proc.stdout.readline()
-        if line != '':
-            # the real code does filtering here
-            print line.rstrip()
-            splitted_line = line.split()
-            host = splitted_line[1]
-            up = True if splitted_line[0] == 'UN' else False
-            host_statuses[host] = up
-            if up is False:
-                hosts_down = True
-        else:
-            proc.stdout.flush()
-            break
+    for line in stdout.splitlines():
+        # the real code does filtering here
+        print line.rstrip()
+        splitted_line = line.split()
+        host = splitted_line[1]
+        up = True if splitted_line[0] == 'UN' else False
+        host_statuses[host] = up
+        if up is False:
+            hosts_down = True
 
     if len(host_statuses) != num_cassandra_nodes or hosts_down:
         logger.error('Cassandra is not deployed correctly!')
@@ -231,11 +225,11 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, total_nu
         pbs_probs = []
         for elapsed_time_in_ms in range(0, 50):
             # Replication factor, time, numVersions, percentileLatency
-            proc = subprocess.Popen(
-                    ['%s/bin/nodetool' % cassandra_path, '-h', seed_host, 'predictconsistency %d %d 1 | grep "Probability of consistent reads"' % (replication_factor, elapsed_time_in_ms)],
-                    stdout=subprocess.PIPE)
+            stdout = subprocess.check_output('%s/bin/nodetool -h %s predictconsistency %d %d 1 | '
+                                    'grep "Probability of consistent reads"' %
+                                    (cassandra_path, seed_host, replication_factor, elapsed_time_in_ms), shell=True)
 
-            line = proc.stdout.readline()
+            line = stdout.splitlines()[0]
             logger.debug('elapsed_time_in_ms:%d, %s' % (elapsed_time_in_ms, line))
             prob = float(line.split()[4])
             pbs_probs.append(prob)
