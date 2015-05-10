@@ -41,6 +41,6 @@ sudo -u root bash <<EOF
 
 
 # Execute coordinator with emulab profile
-python /proj/ISS/shin14/bw-cassandra/script/coordinator.py emulab ${JOBID} 2>&1 | tee /tmp/bw-cassandra-log-${JOBID}.txt
+python /proj/ISS/shin14/bw-cassandra/script/coordinator.py emulab ${JOBID} 2>&1 | tee /proj/ISS/shin14/bw-cassandra/log/bw-cassandra-log-${JOBID}.txt
 
 EOF
