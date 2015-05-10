@@ -133,9 +133,12 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, total_nu
     for t in threads:
         t.join()
 
+    sleep(10)
+    os.system('%s/bin/nodetool status -h %s | grep 10.1.1' % (cassandra_path, seed_host))
+
     logger.debug('Cassandra deploy threads finished with outputs: %s...' % output)
     proc = subprocess.Popen(
-        ['ssh', seed_host, '%s/bin/nodetool status -h %s | grep 10.1.1' % (cassandra_path, seed_host)],
+        ['%s/bin/nodetool status -h %s | grep 10.1.1' % (cassandra_path, seed_host)],
         stdout=subprocess.PIPE)
     host_statuses = {}
     hosts_down = False
