@@ -10,13 +10,33 @@ cp /users/yossupp/.ssh/id_rsa /root/.ssh/
 cat /users/yossupp/.ssh/authorized_keys >> /root/.ssh/authorized_keys
 fi
 
+# Mount Ramdisk
+if [ "\`mount -l | grep /tmp/ramdisk | wc -l\`" -eq "0" ]; then
+echo "Mounting ramdisk at \$HOST"
+
+rm -rf /tmp/ramdisk
+mkdir /tmp/ramdisk
+sudo mount -t tmpfs -o size=4096M tmpfs /tmp/ramdisk
+fi
+
+
+# Adjust max number of files
+if [ "\`ulimit -n\`" -eq "1024" ]; then
+cat << FOE >> /etc/security/limits.conf
+
+*    -   memlock  unlimited
+*    -   nofile   100000
+root    -   memlock  unlimited
+root    -   nofile   100000
+
+FOE
+fi
+
+
 EOF
 
 
 sudo -u root bash <<EOF
-
-# Updating maximum opened file descriptor limit
-ulimit -n 32768
 
 # Execute coordinator with emulab profile
 python /proj/ISS/shin14/bw-cassandra/bw-cassandra/coordinator.py emulab 2>&1 | tee /tmp/bw-cassandra-log.txt

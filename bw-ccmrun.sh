@@ -1,4 +1,3 @@
 #!/bin/bash
 
-cd /u/sciteam/shin1/scratch/bw-cassandra
-python coordinator.py bw 2>&1 | tee /u/sciteam/shin1/scratch/bw-cassandra-log.txt
+python coordinator.py bw ${PBS_JOBID} 2>&1 | tee /u/sciteam/shin1/scratch/log/bw-cassandra-log-${PBS_JOBID}.txt

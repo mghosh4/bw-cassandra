@@ -1,6 +1,6 @@
 #!/bin/bash
-#PBS -l nodes=35:ppn=32:xe
-#PBS -l walltime=10:00:00
+#PBS -l nodes=21:ppn=32:xe
+#PBS -l walltime=5:00:00
 #PBS -l gres=ccm
 ##PBS -j oe
 ##PBS -o /u/sciteam/shin1/scratch/$PBS_JOBID.out
@@ -18,5 +18,5 @@ module load ccm
 
 export APRUN_XFER_LIMITS=1
 
-cd /u/sciteam/shin1/scratch/bw-cassandra
+cd /projects/sciteam/jsb/shin1/bw-cassandra
 ccmrun sh bw-ccmrun.sh

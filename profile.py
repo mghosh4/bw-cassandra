@@ -5,13 +5,18 @@ __author__ = 'Daniel'
 
 
 class BaseProfile(object):
-    def __init__(self):
+    def __init__(self, job_id):
         self.config = ConfigParser.SafeConfigParser()
-        pass
+        self.job_id = job_id
+
+    def get_result_base_path(self):
+        result_base_path = '%s/%s' % (self.config.get('path', 'result_base_path'), self.job_id)
+        return result_base_path
+
 
 class BlueWatersProfile(BaseProfile):
-    def __init__(self):
-        BaseProfile.__init__(self)
+    def __init__(self, job_id):
+        BaseProfile.__init__(self, job_id)
         self.config.read('bw-config.ini')
 
     # Get host names in .crayccm file
@@ -31,7 +36,7 @@ class BlueWatersProfile(BaseProfile):
         return 'bw'
 
     def get_log_path(self):
-        return '/u/sciteam/shin1/scratch'
+        return '/u/sciteam/shin1/scratch/log'
 
     def get_heuristic_target_throughputs(self, num_cassandra_nodes):
         single_node_throughput = 100000
@@ -55,18 +60,9 @@ class BlueWatersProfile(BaseProfile):
         return 128  # 8 connections per core (according to Solving Big Data Challenges paper)
 
 
-class BlueWatersNetworkProfile(BlueWatersProfile):
-    def __init__(self):
-        BlueWatersProfile.__init__(self)
-        self.config.read('bw-network-config.ini')
-
-    def get_name(self):
-        return 'bw-network'
-
-
 class EmulabProfile(BaseProfile):
-    def __init__(self):
-        BaseProfile.__init__(self)
+    def __init__(self, job_id):
+        BaseProfile.__init__(self, job_id)
         self.config.read('emulab-config.ini')
 
     def get_hosts(self):
@@ -112,35 +108,11 @@ class EmulabProfile(BaseProfile):
         return 32  # 8 connections per core (according to Solving Big Data Challenges paper)
 
 
-class EmulabRamdiskProfile(EmulabProfile):
-    def __init__(self):
-        BaseProfile.__init__(self)
-        self.config.read('emulab-ramdisk-config.ini')
-
-    def get_name(self):
-        return 'emulab-ramdisk'
-
-
-class EmulabNetworkProfile(EmulabProfile):
-    def __init__(self):
-        BaseProfile.__init__(self)
-        self.config.read('emulab-network-config.ini')
-
-    def get_name(self):
-        return 'emulab-network'
-
-
-def get_profile(profile_name):
+def get_profile(profile_name, job_id):
     if profile_name == 'bw':
-        pf = BlueWatersProfile()
-    elif profile_name == 'bw-network':
-        pf = BlueWatersNetworkProfile()
+        pf = BlueWatersProfile(job_id)
     elif profile_name == 'emulab':
-        pf = EmulabProfile()
-    elif profile_name == 'emulab-ramdisk':
-        pf = EmulabRamdiskProfile()
-    elif profile_name == 'emulab-network':
-        pf = EmulabNetworkProfile()
+        pf = EmulabProfile(job_id)
     else:
         raise Exception('Specify which profile to use...')
     return pf

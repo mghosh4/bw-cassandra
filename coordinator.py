@@ -6,6 +6,7 @@ import thread
 import sys
 import profile
 import logging
+import subprocess
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s: '
@@ -16,10 +17,40 @@ logging.basicConfig(level=logging.DEBUG,
                            '%(message)s')
 logger = logging.getLogger(__name__)
 
-private_config = ConfigParser.SafeConfigParser()
-private_config.read('private.ini')
 
-workload_types = ['uniform', 'zipfian', 'latest', 'readonly']
+class KillCassandraThread(Thread):
+    def __init__(self, host):
+        Thread.__init__(self)
+        self.host = host
+
+    def run(self):
+        logger.debug('Killing Casandra at host %s' % self.host)
+        os.system('ssh %s ps aux | grep cassandra | grep -v grep | grep java | awk \'{print $2}\' | '
+                  'xargs ssh %s kill -9' % (self.host, self.host))
+
+
+class CassandraDeployThread(Thread):
+    def __init__(self, cassandra_path, cassandra_home, seed_host, host, java_path, mutex, output, cassandra_version):
+        Thread.__init__(self)
+        self.cassandra_path = cassandra_path
+        self.cassandra_home = cassandra_home
+        self.seed_host = seed_host
+        self.host = host
+        self.java_path = java_path
+        self.mutex = mutex
+        self.output = output
+        self.cassandra_version = cassandra_version
+
+    def run(self):
+        logger.debug('Deploying cassandra at host %s' % self.host)
+        ret = os.system('sh deploy-cassandra-cluster-%s.sh --orig_cassandra_path=%s --cassandra_home=%s '
+                        '--seed_host=%s --dst_host=%s --java_path=%s' %
+                        (self.cassandra_version, self.cassandra_path, self.cassandra_home, self.seed_host,
+                         self.host, self.java_path))
+        self.mutex.acquire()
+        self.output.append(ret)
+        self.mutex.release()
+        logger.debug('Finished executing deploy cassandra thread at host %s' % self.host)
 
 
 class YcsbExecuteThread(Thread):
@@ -48,43 +79,84 @@ class YcsbExecuteThread(Thread):
 
 
 def run_experiment(pf, hosts, overall_target_throughput, workload_type, total_num_records, replication_factor,
-                   num_cassandra_nodes, num_ycsb_nodes, total_num_ycsb_threads):
+                   num_cassandra_nodes, num_ycsb_nodes, total_num_ycsb_threads, cassandra_version, predict_pbs=False):
     cassandra_path = pf.config.get('path', 'cassandra_path')
     cassandra_home_base_path = pf.config.get('path', 'cassandra_home_base_path')
     ycsb_path = pf.config.get('path', 'ycsb_path')
     java_path = pf.config.get('path', 'java_path')
-    result_base_path = pf.config.get('path', 'result_base_path')
 
     result_dir_name = strftime('%m-%d-%H%M')
-    result_path = '%s/%s' % (result_base_path, result_dir_name)
+    result_path = '%s/%s' % (pf.get_result_base_path(), result_dir_name)
     logger.debug('Executing w/ pf=%s, num_hosts=%d, overall_target_throughput=%d, workload_type=%s, '
                  'num_records=%d, replication_factor=%d, num_cassandra_nodes=%d, result_dir_name=%s, '
-                 'num_ycsb_nodes=%d, total_num_ycsb_threads=%d' %
+                 'num_ycsb_nodes=%d, total_num_ycsb_threads=%d, cassandra_version=%s, predict_pbs=%s' %
                  (pf.get_name(), len(hosts), int(overall_target_throughput or -1), workload_type,
                   total_num_records, replication_factor, num_cassandra_nodes, result_dir_name,
-                  num_ycsb_nodes, total_num_ycsb_threads))
+                  num_ycsb_nodes, total_num_ycsb_threads, cassandra_version, predict_pbs))
 
     assert num_cassandra_nodes <= pf.get_max_num_cassandra_nodes()
     assert num_ycsb_nodes <= pf.get_max_num_ycsb_nodes()
     assert num_cassandra_nodes + num_ycsb_nodes <= len(hosts)
 
+    threads = []
     # Kill cassandra on all hosts
     for host in hosts:
-        logger.debug('Killing Casandra at host %s' % host)
-        os.system('ssh %s ps aux | grep cassandra | grep -v grep | grep java | awk \'{print $2}\' | '
-                  'xargs ssh %s kill -9' % (host, host))
+        current_thread = KillCassandraThread(host)
+        threads.append(current_thread)
+        current_thread.start()
 
-    sleep(10)
+    for t in threads:
+        t.join()
+    logger.debug('All Cassandra instances are killed.')
+    sleep(5)
 
-    seed_host = hosts[0]
     # Cleanup, make directories, and run cassandra
+    seed_host = hosts[0]
+    threads = []
+    output = []
+    mutex = thread.allocate_lock()
     for host in hosts[0:num_cassandra_nodes]:
-        logger.debug('Deploying cassandra at host %s' % host)
         cassandra_home = '%s/%s' % (cassandra_home_base_path, host)
-        ret = os.system('sh deploy-cassandra-cluster.sh --orig_cassandra_path=%s --cassandra_home=%s '
-                        '--seed_host=%s --dst_host=%s --java_path=%s' %
-                        (cassandra_path, cassandra_home, seed_host, host, java_path))
-        sleep(15)
+        if host == seed_host:  # Synchronous execution for the seed host
+            logger.debug('Deploying cassandra at host %s' % host)
+            ret = os.system('sh deploy-cassandra-cluster-%s.sh --orig_cassandra_path=%s --cassandra_home=%s '
+                            '--seed_host=%s --dst_host=%s --java_path=%s' %
+                            (cassandra_version, cassandra_path, cassandra_home, seed_host, host, java_path))
+            sleep(5)
+        else:  # Concurrent execution for other hosts
+            current_thread = CassandraDeployThread(cassandra_path, cassandra_home, seed_host, host, java_path, mutex,
+                                                   output, cassandra_version)
+            threads.append(current_thread)
+            current_thread.start()
+            sleep(5)
+
+    for t in threads:
+        t.join()
+
+    logger.debug('Cassandra deploy threads finished with outputs: %s...' % output)
+    proc = subprocess.Popen(
+        ['ssh', seed_host, '%s/bin/nodetool status -h %s | grep 10.1.1' % (cassandra_path, seed_host)],
+        stdout=subprocess.PIPE)
+    host_statuses = {}
+    hosts_down = False
+    while True:
+        line = proc.stdout.readline()
+        if line != '':
+            # the real code does filtering here
+            print line.rstrip()
+            splitted_line = line.split()
+            host = splitted_line[1]
+            up = True if splitted_line[0] == 'UN' else False
+            host_statuses[host] = up
+            if up is False:
+                hosts_down = True
+        else:
+            proc.stdout.flush()
+            break
+
+    if len(host_statuses) != num_cassandra_nodes or hosts_down:
+        logger.error('Cassandra is not deployed correctly!')
+        raise Exception('Cassandra is not deployed correctly! %s' % str(host_statuses))
 
     # Running YCSB load script
     logger.debug('Running YCSB load script')
@@ -116,15 +188,18 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, total_nu
     meta.set('config', 'num_ycsb_nodes', num_ycsb_nodes)
     meta.set('config', 'total_num_ycsb_threads', total_num_ycsb_threads)
     meta.set('config', 'result_dir_name', result_dir_name)
-    meta_file = open('%s/meta.ini' % result_path, 'w')
-    meta.write(meta_file)
-    meta_file.close()
+    meta.set('config', 'cassandra_version', cassandra_version)
+    meta.set('config', 'predict_pbs', predict_pbs)
+
+    base_path = pf.config.get('path', 'base_path')
+    if predict_pbs:
+        os.system('echo "run -b org.apache.cassandra.service:type=PBSPredictor enableConsistencyPredictionLogging" '
+                  '| %s/bin/java -jar %s/jmxterm-1.0-alpha-4-uber.jar -l %s:7199' %
+                  (java_path, base_path, seed_host))
 
     threads = []
     output = []
     mutex = thread.allocate_lock()
-
-    sleep(10)
 
     # Run YCSB executor threads in parallel at each host
     logger.debug('Running YCSB execute workload at each host in parallel...')
@@ -145,15 +220,27 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, total_nu
         delay_in_millisec -= interval_in_millisec
         sleep(interval_in_millisec * 0.001)
 
-    # sleep(30)
-    # for host in hosts[0:num_cassandra_nodes]:
-    #     logger.debug('Open files at host %s' % host)
-    #     os.system('ssh %s \'sh %s/lsof.sh \'' % (host, src_path))
-
     for t in threads:
         t.join()
 
     logger.debug('Threads finished executing with outputs: %s...' % output)
+
+    if predict_pbs:
+        pbs_probs = []
+        for elapsed_time_in_ms in range(0, 50):
+            # Replication factor, time, numVersions, percentileLatency
+            proc = subprocess.Popen(
+                    ['%s/bin/nodetool' % cassandra_path, '-h', seed_host, 'predictconsistency %d %d 1 | grep "Probability of consistent reads"' % (replication_factor, elapsed_time_in_ms)],
+                    stdout=subprocess.PIPE)
+
+            line = proc.stdout.readline()
+            prob = float(line.split()[4])
+            pbs_probs.append(prob)
+        meta.set('result', str(pbs_probs))
+
+    meta_file = open('%s/meta.ini' % result_path, 'w')
+    meta.write(meta_file)
+    meta_file.close()
 
 
 # differ throughputs
@@ -256,31 +343,62 @@ def experiment_on_latency_scalability(pf):
                                     total_num_ycsb_threads=total_num_ycsb_threads)
 
 
+def experiment_on_pbs(pf, repeat):
+    default_num_records = int(pf.config.get('experiment', 'default_num_records'))
+    default_workload_type = pf.config.get('experiment', 'default_workload_type')
+    num_cassandra_nodes = int(pf.config.get('experiment', 'default_num_cassandra_nodes'))
+    default_replication_factor = 3
+    cassandra_version = '1.2.8'
+    hosts = pf.get_hosts()
+
+    for i in range(repeat):
+        total_num_ycsb_threads = pf.get_max_num_connections_per_cassandra_node() * num_cassandra_nodes
+        total_num_records = default_num_records * num_cassandra_nodes
+        num_ycsb_nodes = total_num_ycsb_threads / pf.get_max_allowed_num_ycsb_threads_per_node() + 1
+        logger.debug('Experiment on pbs')
+
+        result = run_experiment(pf,
+                                hosts=hosts,
+                                overall_target_throughput=None,
+                                total_num_records=total_num_records,
+                                workload_type=default_workload_type,
+                                replication_factor=default_replication_factor,
+                                num_cassandra_nodes=num_cassandra_nodes,
+                                num_ycsb_nodes=num_ycsb_nodes,
+                                total_num_ycsb_threads=total_num_ycsb_threads,
+                                cassandra_version=cassandra_version,
+                                predict_pbs=True)
+
+
 def main():
     profile_name = sys.argv[1]
-    pf = profile.get_profile(profile_name)
+    job_id = sys.argv[2]
+    pf = profile.get_profile(profile_name, job_id)
 
     # Cleanup existing result directory and create a new one
     result_file_name = strftime('%m-%d-%H%M') + '.tar.gz'
-    result_base_path = pf.config.get('path', 'result_base_path')
-    os.system('rm -rf %s;mkdir %s' % (result_base_path, result_base_path))
+
+    result_base_path = pf.get_result_base_path()
+    os.system('mkdir %s' % result_base_path)
 
     repeat = int(pf.config.get('experiment', 'repeat'))
 
     # Do all experiments here
     # experiment_on_throughputs(pf, int(pf.config.get('experiment', 'default_num_cassandra_nodes')), repeat)
-    experiment_on_num_cassandra_nodes_and_throughput(pf, repeat)
+    # experiment_on_num_cassandra_nodes_and_throughput(pf, repeat)
     # experiment_on_num_cassandra_nodes_with_no_throughput_limit(pf, repeat)
     # experiment_on_num_ycsb_threads(pf)
     # experiment_on_latency_scalability(pf)
 
+    experiment_on_pbs(pf, repeat)
+
     # Copy log to result directory
-    os.system('cp %s/bw-cassandra-log.txt %s/' % (pf.get_log_path(), result_base_path))
+    os.system('cp %s/bw-cassandra-log-%s.txt %s/bw-cassandra-log.txt' % (pf.get_log_path(), job_id, result_base_path))
 
     # Archive the result and send to remote server
     os.system('tar -czf /tmp/%s -C %s .'
               % (result_file_name, result_base_path))
-    private_key_path = pf.config.get('path', 'private_key_path')
+    private_key_path = pf.config.get('path', 'base_path')
     os.system('scp -o StrictHostKeyChecking=no -P8888 -i %s/sshuser_key /tmp/%s sshuser@104.236.110.182:%s/'
               % (private_key_path, result_file_name, pf.get_name()))
     os.system('rm /tmp/%s' % result_file_name)

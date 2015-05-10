@@ -13,8 +13,8 @@ data_base_path = '../../data/latency_scalability'
 
 def plot_throughput_vs_latency():
 
-    df = parse_results()
-    # df = read_most_recent_csv_into_dataframe()
+    # df = parse_results()
+    df = read_most_recent_csv_into_dataframe()
 
     output_dir_name = strftime('%m-%d-%H%M')
     try:
@@ -76,7 +76,7 @@ def plot_throughput_vs_latency():
     aggregated = grouped['overall_throughput'].agg([np.mean, np.std])
     flattened = aggregated.reset_index()
 
-    plt.plot(flattened['num_cassandra_nodes'].values.tolist(), flattened['mean'].values.tolist(), 'b-', label='emulab')
+    plt.plot(flattened['num_cassandra_nodes'].values.tolist(), flattened['mean'].values.tolist(), 'b--', label='emulab')
 
     # Save the default tick positions, so we can reset them...
     locs, labels = plt.xticks()
@@ -132,7 +132,7 @@ def plot_throughput_vs_latency():
     aggregated = grouped['read_average_latency'].agg([np.mean, np.std])
     flattened = aggregated.reset_index()
 
-    plt.plot(flattened['num_cassandra_nodes'].values.tolist(), flattened['mean'].values.tolist(), 'b-', label='emulab')
+    plt.plot(flattened['num_cassandra_nodes'].values.tolist(), flattened['mean'].values.tolist(), 'b--', label='emulab')
 
     # Save the default tick positions, so we can reset them...
     locs, labels = plt.xticks()
