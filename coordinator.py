@@ -176,6 +176,7 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, total_nu
     # Save configuration files for this experiment
     meta = ConfigParser.ConfigParser()
     meta.add_section('config')
+    meta.add_section('result')
     meta.set('config', 'profile', pf.get_name())
     meta.set('config', 'num_hosts', len(hosts))
     if overall_target_throughput is not None:
