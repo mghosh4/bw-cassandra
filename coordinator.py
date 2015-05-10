@@ -359,7 +359,7 @@ def experiment_on_pbs(pf, repeat):
     else:
         num_cassandra_nodes = 12
 
-    overall_target_throughput = 180000
+    overall_target_throughput = 60000
 
     for i in range(repeat):
         total_num_ycsb_threads = pf.get_max_num_connections_per_cassandra_node() * num_cassandra_nodes
