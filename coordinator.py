@@ -350,20 +350,21 @@ def experiment_on_latency_scalability(pf):
 
 
 def experiment_on_pbs(pf, repeat):
-    default_num_records = int(pf.config.get('experiment', 'default_num_records'))
+    # default_num_records = int(pf.config.get('experiment', 'default_num_records'))
+    default_num_records = 500000  # 500 MB per node
     default_workload_type = pf.config.get('experiment', 'default_workload_type')
     # num_cassandra_nodes = int(pf.config.get('experiment', 'default_num_cassandra_nodes'))
     default_replication_factor = 3
     cassandra_version = '1.2.8'
     hosts = pf.get_hosts()
     if pf.get_name() == 'bw':
-        num_cassandra_nodes = 3
+        num_cassandra_nodes = 4
         num_records = default_num_records * 4
     else:
-        num_cassandra_nodes = 12
+        num_cassandra_nodes = 16
         num_records = default_num_records
 
-    overall_target_throughput = 50000
+    overall_target_throughput = 60000
 
     for i in range(repeat):
         total_num_ycsb_threads = pf.get_max_num_connections_per_cassandra_node() * num_cassandra_nodes
