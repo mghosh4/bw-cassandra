@@ -134,7 +134,6 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, total_nu
         t.join()
 
     sleep(10)
-    os.system('%s/bin/nodetool status -h %s' % (cassandra_path, seed_host))
 
     logger.debug('Cassandra deploy threads finished with outputs: %s...' % output)
     proc = subprocess.Popen(
