@@ -136,13 +136,14 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, total_nu
     sleep(10)
 
     logger.debug('Cassandra deploy threads finished with outputs: %s...' % output)
-    lines = subprocess.Popen(['%s/bin/nodetool' % cassandra_path, '-h', seed_host, 'status'],
+    raw_output = subprocess.Popen(['%s/bin/nodetool' % cassandra_path, '-h', seed_host, 'status'],
                                      stdout=subprocess.PIPE).communicate()[0]
+    lines = raw_output.splitlines()
     filtered_lines = filter(lambda x: x.find('rack') != -1, lines)
 
     host_statuses = {}
     hosts_down = False
-    for line in filtered_lines.splitlines():
+    for line in filtered_lines:
         # the real code does filtering here
         print line.rstrip()
         splitted_line = line.split()
@@ -228,12 +229,12 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, total_nu
         for elapsed_time_in_ms in range(0, 50):
             # Replication factor, time, numVersions, percentileLatency
 
-            lines = subprocess.Popen(['%s/bin/nodetool' % cassandra_path, '-h', seed_host,
+            raw_output = subprocess.Popen(['%s/bin/nodetool' % cassandra_path, '-h', seed_host,
                                       'predictconsistency %d %d 1 | grep "Probability of consistent reads"' %
                                       (replication_factor, elapsed_time_in_ms)],
                                      stdout=subprocess.PIPE).communicate()[0]
 
-            line = lines.splitlines()[0]
+            line = raw_output.splitlines()[0]
             logger.debug('elapsed_time_in_ms:%d, %s' % (elapsed_time_in_ms, line))
             prob = float(line.split()[4])
             pbs_probs.append(prob)
