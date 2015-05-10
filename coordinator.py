@@ -230,11 +230,12 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, total_nu
             # Replication factor, time, numVersions, percentileLatency
 
             raw_output = subprocess.Popen(['%s/bin/nodetool' % cassandra_path, '-h', seed_host,
-                                      'predictconsistency %d %d 1 | grep "Probability of consistent reads"' %
-                                      (replication_factor, elapsed_time_in_ms)],
-                                     stdout=subprocess.PIPE).communicate()[0]
+                                          'predictconsistency %d %d 1' % (replication_factor, elapsed_time_in_ms)],
+                                          stdout=subprocess.PIPE).communicate()[0]
 
-            line = raw_output.splitlines()[0]
+            lines = raw_output.splitlines()
+            filtered_lines = filter(lambda x: x.find('Probability of consistent reads') != -1, lines)
+            line = filtered_lines[0]
             logger.debug('elapsed_time_in_ms:%d, %s' % (elapsed_time_in_ms, line))
             prob = float(line.split()[4])
             pbs_probs.append(prob)
