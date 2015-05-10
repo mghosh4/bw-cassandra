@@ -356,14 +356,16 @@ def experiment_on_pbs(pf, repeat):
     hosts = pf.get_hosts()
     if pf.get_name() == 'bw':
         num_cassandra_nodes = 3
+        num_records = default_num_records * 4
     else:
         num_cassandra_nodes = 12
+        num_records = default_num_records
 
     overall_target_throughput = 60000
 
     for i in range(repeat):
         total_num_ycsb_threads = pf.get_max_num_connections_per_cassandra_node() * num_cassandra_nodes
-        total_num_records = default_num_records * num_cassandra_nodes
+        total_num_records = num_records * num_cassandra_nodes
         num_ycsb_nodes = total_num_ycsb_threads / pf.get_max_allowed_num_ycsb_threads_per_node() + 1
         logger.debug('Experiment on pbs')
 
