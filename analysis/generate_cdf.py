@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 import numpy
 import time
+import ast
 
 from analysis import ycsb_parser
 
@@ -23,6 +24,7 @@ except:
 raw_data_root = '%s/raw' % data_base_path
 
 profile_dicts = {}
+prob_rows_dict = {'bw': [], 'emulab': []}
 for profile_name in ['bw', 'emulab']:
     for dir_name in os.listdir('%s/%s' % (raw_data_root, profile_name)):
         if re.search('[0-9][0-9]\-[0-9][0-9]\-[0-9][0-9][0-9][0-9]$', dir_name) is not None:
@@ -51,7 +53,6 @@ for profile_name in ['bw', 'emulab']:
                             else:
                                 aggregate_dicts[rw][key] = value
 
-            # profile_dicts[profile_name] = aggregate_dicts
             if profile_name not in profile_dicts:
                 profile_dicts[profile_name] = aggregate_dicts
             else:
@@ -61,6 +62,12 @@ for profile_name in ['bw', 'emulab']:
                             profile_dicts[profile_name][rw][key] += value
                         else:
                             profile_dicts[profile_name][rw][key] = value
+
+            # PBS Probability
+            if meta.has_option('result', 'pbs_probabilities'):
+                pbs_probs = ast.literal_eval(meta.get('result', 'pbs_probabilities'))
+                for t, prob in enumerate(pbs_probs):
+                    prob_rows_dict[profile_name].append({'time': t, 'probability': prob})
 
 
 for profile_name in profile_dicts.keys():
@@ -91,3 +98,16 @@ for rw in ['read', 'update']:
 
     os.system('./plot-latency-cdf.sh --rw=%s --output_path=%s --bw=%s --emulab=%s' %
               (rw, output_path, bw_path, emulab_path))
+
+
+for profile_name in profile_dicts.keys():
+    df = pd.DataFrame(prob_rows_dict[profile_name])
+    grouped = df.groupby('time')
+    df = grouped.mean()
+    csv_file_path = '%s/%s-consistency-probability.csv' % (output_dir_path, profile_name)
+    df.to_csv(csv_file_path)
+
+output_path = '%s/consistency-probability.png' % output_dir_path
+os.system('./plot-consistency-probability.sh --output_path=%s --bw=%s --emulab=%s' %
+              (output_path, '%s/bw-consistency-probability.csv' % output_dir_path,
+               '%s/emulab-consistency-probability.csv' % output_dir_path))

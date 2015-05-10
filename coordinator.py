@@ -237,7 +237,9 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, total_nu
             lines = raw_output.splitlines()
             filtered_lines = filter(lambda x: x.find('Probability of consistent reads') != -1, lines)
             line = filtered_lines[0]
-            logger.debug('elapsed_time_in_ms:%d, %s' % (elapsed_time_in_ms, line))
+            # logger.debug('elapsed_time_in_ms:%d, %s' % (elapsed_time_in_ms, line))
+            logger.debug('elapsed_time_in_ms:%d' % elapsed_time_in_ms)
+            logger.debug(raw_output)
             prob = float(line.split()[4])
             pbs_probs.append(prob)
         meta.set('result', 'pbs_probabilities', str(pbs_probs))
@@ -351,7 +353,7 @@ def experiment_on_pbs(pf, repeat):
     default_num_records = int(pf.config.get('experiment', 'default_num_records'))
     default_workload_type = pf.config.get('experiment', 'default_workload_type')
     # num_cassandra_nodes = int(pf.config.get('experiment', 'default_num_cassandra_nodes'))
-    default_replication_factor = 1
+    default_replication_factor = 3
     cassandra_version = '1.2.8'
     hosts = pf.get_hosts()
     if pf.get_name() == 'bw':
@@ -361,7 +363,7 @@ def experiment_on_pbs(pf, repeat):
         num_cassandra_nodes = 12
         num_records = default_num_records
 
-    overall_target_throughput = 100000
+    overall_target_throughput = 50000
 
     for i in range(repeat):
         total_num_ycsb_threads = pf.get_max_num_connections_per_cassandra_node() * num_cassandra_nodes
