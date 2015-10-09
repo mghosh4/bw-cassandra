@@ -16,15 +16,16 @@ logger = logging.getLogger(__name__)
 src_path = '/projects/sciteam/jsb/shin1/bw-cassandra'
 
 class RunExperimentThread(Thread):
-    def __init__(self, host, packet_size, destinations):
+    def __init__(self, result_base_path, host, packet_size, destinations):
         Thread.__init__(self)
         self.host = host
         self.packet_size = packet_size
         self.destinations = destinations
+        self.result_base_path = result_base_path
 
     def run(self):
         logger.debug('Running experiment at host %s' % self.host)
-        result_path = '/projects/sciteam/jsb/shin1/latency/%s' % self.packet_size
+        result_path = '%s/%s' % (self.result_base_path, self.packet_size)
         destination_hosts_str = ','.join(self.destinations)
         os.system('ssh %s sh %s/latency-profiling/testlatency.sh %s %d %s ' % (self.host, src_path, result_path, self.packet_size, destination_hosts_str))
 
@@ -37,12 +38,14 @@ def main():
     packet_sizes = [64, 1024, 2048]
     all_hosts = pf.get_hosts()
 
+    result_base_path = '/projects/sciteam/jsb/shin1/latency/%s' % job_id
+
     for packet_size in packet_sizes:
         logger.debug('Running experiment for packet_size: %d' % packet_size)
         threads = []
         # Kill cassandra on all hosts
         for host in all_hosts:
-            current_thread = RunExperimentThread(host, packet_size, all_hosts)
+            current_thread = RunExperimentThread(result_base_path, host, packet_size, all_hosts)
             threads.append(current_thread)
             current_thread.start()
 
