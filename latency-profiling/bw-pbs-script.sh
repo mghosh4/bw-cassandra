@@ -18,5 +18,5 @@ module load ccm
 
 export APRUN_XFER_LIMITS=1
 
-cd /projects/sciteam/jsb/shin1/bw-cassandra
+cd /projects/sciteam/jsb/shin1/bw-cassandra/latency-profiling
 ccmrun sh bw-ccmrun.sh
