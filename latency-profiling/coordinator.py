@@ -27,7 +27,7 @@ class RunExperimentThread(Thread):
         logger.debug('Running experiment at host %s' % self.host)
         result_path = '/projects/sciteam/jsb/shin1/latency/%s' % self.packet_size
         destination_hosts_str = ' '.join(self.destinations)
-        os.system('ssh %s sh %s/latency-profiling/testlatency.sh %s %d \"%s\" ' % (self.host, src_path, result_path, self.packet_size, destination_hosts_str))
+        os.system('ssh %s sh %s/latency-profiling/testlatency.sh %s %d \'%s\' ' % (self.host, src_path, result_path, self.packet_size, destination_hosts_str))
 
 
 def main():
