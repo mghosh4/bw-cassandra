@@ -10,6 +10,7 @@ nodenames=$3
 
 for name in $nodenames
 do
+	echo $name
 	if [ `hostname` != $name ]; then
 		ping -s $2 -c $NUM_PINGS $name >> $1/$filename
 	fi
