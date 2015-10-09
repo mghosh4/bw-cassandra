@@ -6,7 +6,7 @@ NUM_PINGS=30
 filename=`hostname`
 filename="$filename".log
 
-nodenames=$3
+nodenames=$(echo $3 | tr "," "\n")
 echo $nodenames
 
 for name in $nodenames
