@@ -7,6 +7,7 @@ filename=`hostname`
 filename="$filename".log
 
 nodenames=$3
+echo $nodenames
 
 for name in $nodenames
 do
