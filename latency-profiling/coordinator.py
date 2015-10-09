@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 
 src_path = '/projects/sciteam/jsb/shin1/bw-cassandra'
 
-
 class RunExperimentThread(Thread):
     def __init__(self, host, packet_size, destinations):
         Thread.__init__(self)
@@ -26,8 +25,8 @@ class RunExperimentThread(Thread):
     def run(self):
         logger.debug('Running experiment at host %s' % self.host)
         result_path = '/projects/sciteam/jsb/shin1/latency/%s' % self.packet_size
-        destination_hosts_str = ' '.join(self.destinations)
-        os.system('ssh %s sh %s/latency-profiling/testlatency.sh %s %d \'%s\' ' % (self.host, src_path, result_path, self.packet_size, destination_hosts_str))
+        destination_hosts_str = ','.join(self.destinations)
+        os.system('ssh %s sh %s/latency-profiling/testlatency.sh %s %d %s ' % (self.host, src_path, result_path, self.packet_size, destination_hosts_str))
 
 
 def main():
