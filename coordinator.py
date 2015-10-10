@@ -400,13 +400,13 @@ def main():
     repeat = int(pf.config.get('experiment', 'repeat'))
 
     # Do all experiments here
-    # experiment_on_throughputs(pf, int(pf.config.get('experiment', 'default_num_cassandra_nodes')), repeat)
+    experiment_on_throughputs(pf, int(pf.config.get('experiment', 'default_num_cassandra_nodes')), repeat)
     # experiment_on_num_cassandra_nodes_and_throughput(pf, repeat)
     # experiment_on_num_cassandra_nodes_with_no_throughput_limit(pf, repeat)
     # experiment_on_num_ycsb_threads(pf)
     # experiment_on_latency_scalability(pf)
 
-    experiment_on_pbs(pf, repeat)
+    # experiment_on_pbs(pf, repeat)
 
     # Copy log to result directory
     os.system('cp %s/bw-cassandra-log-%s.txt %s/bw-cassandra-log.txt' % (pf.config.get('path', 'log_path'), job_id, result_base_path))
