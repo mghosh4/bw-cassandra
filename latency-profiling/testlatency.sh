@@ -12,6 +12,6 @@ for name in $nodenames
 do
 	if [ `hostname` != $name ]; then
 		echo "From" $filename "pinging" $name
-		ping -i 0.1 -s $2 -c $NUM_PINGS $name >> $1/$filename
+		ping -i 0.2 -s $2 -c $NUM_PINGS $name >> $1/$filename
 	fi
 done
