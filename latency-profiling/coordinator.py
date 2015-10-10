@@ -35,7 +35,7 @@ def main():
     job_id = sys.argv[2]
     pf = profile.get_profile(profile_name, job_id)
 
-    packet_sizes = [64, 1024, 2048, 16384]
+    packet_sizes = [64, 1024, 4096, 16384]
     all_hosts = pf.get_hosts()
 
     result_base_path = '/projects/sciteam/jsb/shin1/latency/%s' % job_id
