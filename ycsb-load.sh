@@ -71,7 +71,7 @@ sleep 10
 
 # Create output directory if not exists
 if [ ! -f ${BASE_PATH} ]; then
-    mkdir ${BASE_PATH}
+    mkdir -p ${BASE_PATH}
 fi
 
 # Create YCSB workload file
