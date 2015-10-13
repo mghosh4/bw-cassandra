@@ -80,7 +80,8 @@ class YcsbExecuteThread(Thread):
 
 
 def run_experiment(pf, hosts, overall_target_throughput, workload_type, total_num_records, replication_factor,
-                   num_cassandra_nodes, num_ycsb_nodes, total_num_ycsb_threads, cassandra_version, predict_pbs=False):
+                   num_cassandra_nodes, num_ycsb_nodes, total_num_ycsb_threads, cassandra_version='2.1.3',
+                   predict_pbs=False):
     cassandra_path = pf.config.get('path', 'cassandra_path')
     cassandra_home_base_path = pf.config.get('path', 'cassandra_home_base_path')
     ycsb_path = pf.config.get('path', 'ycsb_path')
@@ -388,7 +389,7 @@ def experiment_on_pbs(pf, repeat):
 
 def main():
     profile_name = sys.argv[1]
-    job_id = sys.argv[2]
+    job_id = sys.argv[2] if len(sys.argv) > 2 else None
     pf = profile.get_profile(profile_name, job_id)
 
     # Cleanup existing result directory and create a new one

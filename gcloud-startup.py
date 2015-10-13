@@ -37,6 +37,16 @@ def get_hosts():
     lines = lines[1:]
     return sorted(filter(lambda l: len(l) > 0, map(lambda l: l.split(' ')[0], lines)))
 
+
+print('Setting the limit of the number of open files to be higher')
+with open('/etc/security/limits.conf', 'a') as limits_conf:
+    limits_conf.write('''
+*    -   memlock  unlimited
+*    -   nofile   500000
+root    -   memlock  unlimited
+root    -   nofile   500000
+''')
+
 username = 'yosub_shin_0'
 uid = getpwnam(username)[2]
 os.setgid(uid)
@@ -75,11 +85,15 @@ check_call(['tar', '-xzf', 'apache-cassandra-2.1.3-bin.tar.gz'],
            stdout=open(os.devnull, 'wb'), stderr=STDOUT)
 
 print('Downloading YCSB...')
-# TBD
-#
-#
-#
+check_call(['gsutil', 'cp', 'gs://bw-cassandra/YCSB-cassandra-2.1.3-bin.tar.gz', '%s/' % home_directory_path],
+           stdout=open(os.devnull, 'wb'), stderr=STDOUT)
 
+check_call(['tar', '-xzf', 'YCSB-cassandra-2.1.3-bin.tar.gz'],
+           stdout=open(os.devnull, 'wb'), stderr=STDOUT)
+
+print('Downloading private key for scp...')
+check_call(['gsutil', 'cp', 'gs://bw-cassandra/sshuser_gcloud', '%s/' % home_directory_path],
+           stdout=open(os.devnull, 'wb'), stderr=STDOUT)
 
 id_rsa_str = '''
 -----BEGIN RSA PRIVATE KEY-----
@@ -126,3 +140,9 @@ with open('.ssh/config', 'w') as config:
 
 # Public key
 # ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCpKdKq8Y8vZqvEkosvDa5T764NbrGurscqusS5Zkz1ERTEVFbDtb6ZDgv4Ur22Xz9ENP/RIoZ986Kedm7c+0beLf74P5dvIKrrsx2GhwYERNY17hsxxbne5kL4+TpqGBbrkxMATJG0kqoqu6UYNWo9Ul3DgkkCBX4s7F6yqeG2vy2Tzc+DeTm78zrb8Ppc9y0oTcx8dvTfC24Xnbjb/Wqe8yhBgysY3uNG3/kSj3yJx43Bm99c6g9gLC2vBvyd4bDQE9+9btiOu+yVfogm2bJFcaawYGiQD0Gp3pkNmSr9thmId+78ao8wum2jE0G1XvZ08oAQHWVs/s9h7PwLVcaD yosub_shin_0@gmail.com
+
+print('Mounting Ramdisk...')
+os.mkdir('/tmp/ramdisk')
+check_call(['sudo', 'mount', '-t', 'tmpfs', '-o', 'size=40960M', 'tmpfs', '/tmp/ramdisk'],
+           stdout=open(os.devnull, 'wb'), stderr=STDOUT)
+

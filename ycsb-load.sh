@@ -102,6 +102,9 @@ columnfamily=usertable
 
 histogram.buckets=10000
 
+cassandra.writeconsistencylevel=QUORUM
+cassandra.readconsistencylevel=QUORUM
+
 EOF
 
 # Load YCSB Workload
