@@ -61,7 +61,7 @@ os.setuid(uid)
 
 # Let's install binaries first before we get hosts list (May potentially not get every host)
 print('Installing binaries...')
-check_call(['sudo', 'apt-get', 'install', '-y', 'openjdk-7-jre', 'git', 'emacs', 'byobu', 'apt-transport-https'],
+check_call(['sudo', 'apt-get', 'install', '-y', 'git', 'emacs', 'byobu', 'apt-transport-https'],
            stdout=open(os.devnull, 'wb'), stderr=STDOUT)
 
 instance_group_hosts = get_hosts()
@@ -76,11 +76,15 @@ if instance_hostname == master_hostname:
 name_node_hostname = master_hostname
 os.chdir(home_directory_path)
 
+# Download Java
+print('Downloading Java...')
+check_call(['wget', '--no-check-certificate', '--no-cookies', '--header', '"Cookie: oraclelicense=accept-securebackup-cookie"', 'http://download.oracle.com/otn-pub/java/jdk/7u65-b17/jdk-7u65-linux-x64.tar.gz'])
+check_call(['tar', '-xzf', 'jdk-7u65-linux-x64.tar.gz'],
+           stdout=open(os.devnull, 'wb'), stderr=STDOUT)
+
 with open('.bashrc', 'a') as bashrc:
-    bashrc.write('''
-export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/jre
-''')
-os.environ['JAVA_HOME'] = '/usr/lib/jvm/java-7-openjdk-amd64/jre'
+    bashrc.write('export JAVA_HOME=%s/jdk1.7.0_65/jre' % home_directory_path)
+os.environ['JAVA_HOME'] = '%s/jdk1.7.0_65/jre' % home_directory_path
 
 # Download and install Cassandra 2.1.3
 print('Downloading Cassandra...')
