@@ -130,7 +130,7 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, total_nu
                                                    output, cassandra_version)
             threads.append(current_thread)
             current_thread.start()
-            sleep(45)
+            sleep(10)
 
     for t in threads:
         t.join()

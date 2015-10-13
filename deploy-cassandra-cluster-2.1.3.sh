@@ -177,6 +177,6 @@ bash -c "cat > ${CASSANDRA_HOME}/cassandra/conf/logback.xml" <<-EOF
 EOF
 
 echo "# Running Cassandra"
-${CASSANDRA_HOME}/cassandra/bin/cassandra
+${CASSANDRA_HOME}/cassandra/bin/cassandra -Dcassandra.auto_bootstrap=false
 
 EOF2
