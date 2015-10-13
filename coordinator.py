@@ -389,7 +389,7 @@ def experiment_on_pbs(pf, repeat):
 
 def main():
     profile_name = sys.argv[1]
-    job_id = sys.argv[2] if len(sys.argv) > 2 else None
+    job_id = sys.argv[2]
     pf = profile.get_profile(profile_name, job_id)
 
     # Cleanup existing result directory and create a new one

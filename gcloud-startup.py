@@ -78,9 +78,8 @@ os.chdir(home_directory_path)
 
 # Download Java
 print('Downloading Java...')
-check_call(['wget', '--no-check-certificate', '--no-cookies', '--header', '"Cookie: oraclelicense=accept-securebackup-cookie"', 'http://download.oracle.com/otn-pub/java/jdk/7u65-b17/jdk-7u65-linux-x64.tar.gz'])
-check_call(['tar', '-xzf', 'jdk-7u65-linux-x64.tar.gz'],
-           stdout=open(os.devnull, 'wb'), stderr=STDOUT)
+check_call(['wget', '--no-check-certificate', '--no-cookies', '--header', 'Cookie: oraclelicense=accept-securebackup-cookie', 'http://download.oracle.com/otn-pub/java/jdk/7u65-b17/jdk-7u65-linux-x64.tar.gz'])
+check_call(['tar', '-xzf', 'jdk-7u65-linux-x64.tar.gz'])
 
 with open('.bashrc', 'a') as bashrc:
     bashrc.write('export JAVA_HOME=%s/jdk1.7.0_65/jre' % home_directory_path)
