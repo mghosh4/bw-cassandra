@@ -48,7 +48,14 @@ root    -   nofile   500000
 ''')
 
 username = 'yosub_shin_0'
+home_directory_path = '/home/%s' % username
 uid = getpwnam(username)[2]
+
+print('Downloading private key for scp...')
+check_call(['/usr/local/bin/gsutil', 'cp', 'gs://bw-cassandra/sshuser_gcloud', '%s/' % home_directory_path],
+           stdout=open(os.devnull, 'wb'), stderr=STDOUT)
+os.chown('%s/sshuser_gcloud' % home_directory_path, uid, uid)
+
 os.setgid(uid)
 os.setuid(uid)
 
@@ -67,7 +74,6 @@ if instance_hostname == master_hostname:
     print('Current host is the master node')
 
 name_node_hostname = master_hostname
-home_directory_path = '/home/%s' % username
 os.chdir(home_directory_path)
 
 with open('.bashrc', 'a') as bashrc:
@@ -78,22 +84,19 @@ os.environ['JAVA_HOME'] = '/usr/lib/jvm/java-7-openjdk-amd64/jre'
 
 # Download and install Cassandra 2.1.3
 print('Downloading Cassandra...')
-check_call(['gsutil', 'cp', 'gs://bw-cassandra/apache-cassandra-2.1.3-bin.tar.gz', '%s/' % home_directory_path],
+check_call(['wget', 'https://storage.googleapis.com/bw-cassandra/apache-cassandra-2.1.3.tar.gz'],
            stdout=open(os.devnull, 'wb'), stderr=STDOUT)
 
-check_call(['tar', '-xzf', 'apache-cassandra-2.1.3-bin.tar.gz'],
+check_call(['tar', '-xzf', 'apache-cassandra-2.1.3.tar.gz'],
            stdout=open(os.devnull, 'wb'), stderr=STDOUT)
 
 print('Downloading YCSB...')
-check_call(['gsutil', 'cp', 'gs://bw-cassandra/YCSB-cassandra-2.1.3-bin.tar.gz', '%s/' % home_directory_path],
+check_call(['wget', 'https://storage.googleapis.com/bw-cassandra/YCSB-cassandra-2.1.3.tar.gz'],
            stdout=open(os.devnull, 'wb'), stderr=STDOUT)
 
-check_call(['tar', '-xzf', 'YCSB-cassandra-2.1.3-bin.tar.gz'],
+check_call(['tar', '-xzf', 'YCSB-cassandra-2.1.3.tar.gz'],
            stdout=open(os.devnull, 'wb'), stderr=STDOUT)
 
-print('Downloading private key for scp...')
-check_call(['gsutil', 'cp', 'gs://bw-cassandra/sshuser_gcloud', '%s/' % home_directory_path],
-           stdout=open(os.devnull, 'wb'), stderr=STDOUT)
 
 id_rsa_str = '''
 -----BEGIN RSA PRIVATE KEY-----
@@ -146,3 +149,6 @@ os.mkdir('/tmp/ramdisk')
 check_call(['sudo', 'mount', '-t', 'tmpfs', '-o', 'size=40960M', 'tmpfs', '/tmp/ramdisk'],
            stdout=open(os.devnull, 'wb'), stderr=STDOUT)
 
+print('Cloning git repository...')
+check_call(['git', 'clone', 'https://github.com/YosubShin/bw-cassandra.git'],
+           stdout=open(os.devnull, 'wb'), stderr=STDOUT)
