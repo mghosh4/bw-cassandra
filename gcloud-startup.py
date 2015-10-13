@@ -78,12 +78,15 @@ os.chdir(home_directory_path)
 
 # Download Java
 print('Downloading Java...')
-check_call(['wget', '--no-check-certificate', '--no-cookies', '--header', 'Cookie: oraclelicense=accept-securebackup-cookie', 'http://download.oracle.com/otn-pub/java/jdk/7u65-b17/jdk-7u65-linux-x64.tar.gz'])
-check_call(['tar', '-xzf', 'jdk-7u65-linux-x64.tar.gz'])
+check_call(['wget', '--no-check-certificate', '--no-cookies', '--header', 'Cookie: oraclelicense=accept-securebackup-cookie', 'http://download.oracle.com/otn-pub/java/jdk/7u65-b17/jdk-7u65-linux-x64.tar.gz'],
+           stdout=open(os.devnull, 'wb'), stderr=STDOUT)
+check_call(['tar', '-xzf', 'jdk-7u65-linux-x64.tar.gz'],
+           stdout=open(os.devnull, 'wb'), stderr=STDOUT)
 
 with open('.bashrc', 'a') as bashrc:
-    bashrc.write('export JAVA_HOME=%s/jdk1.7.0_65/jre' % home_directory_path)
+    bashrc.write('export JAVA_HOME=%s/jdk1.7.0_65/jre\nexport PATH=$PATH:$JAVA_HOME/bin' % home_directory_path)
 os.environ['JAVA_HOME'] = '%s/jdk1.7.0_65/jre' % home_directory_path
+check_call(['sudo', 'ln', '-s', '%s/jdk1.7.0_65/jre/bin/java' % home_directory_path, '/usr/local/bin/java'])
 
 # Download and install Cassandra 2.1.3
 print('Downloading Cassandra...')

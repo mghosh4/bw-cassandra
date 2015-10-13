@@ -124,13 +124,13 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, total_nu
             ret = os.system('sh deploy-cassandra-cluster-%s.sh --orig_cassandra_path=%s --cassandra_home=%s '
                             '--seed_host=%s --dst_host=%s --java_path=%s' %
                             (cassandra_version, cassandra_path, cassandra_home, seed_host, host, java_path))
-            sleep(5)
+            sleep(10)
         else:  # Concurrent execution for other hosts
             current_thread = CassandraDeployThread(cassandra_path, cassandra_home, seed_host, host, java_path, mutex,
                                                    output, cassandra_version)
             threads.append(current_thread)
             current_thread.start()
-            sleep(5)
+            sleep(10)
 
     for t in threads:
         t.join()
