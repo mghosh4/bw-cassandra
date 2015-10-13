@@ -7,7 +7,6 @@ from subprocess import STDOUT, check_call
 import os
 import subprocess
 from pwd import getpwnam
-import time
 
 
 def get_external_ip():
@@ -38,6 +37,11 @@ def get_hosts():
     return sorted(filter(lambda l: len(l) > 0, map(lambda l: l.split(' ')[0], lines)))
 
 
+# Let's install binaries first before we get hosts list (May potentially not get every host)
+print('Installing binaries...')
+check_call(['sudo', 'apt-get', 'install', '-y', 'git', 'emacs', 'byobu', 'apt-transport-https', 'nfs-kernel-server', 'nfs-common'],
+           stdout=open(os.devnull, 'wb'), stderr=STDOUT)
+
 print('Setting the limit of the number of open files to be higher')
 with open('/etc/security/limits.conf', 'a') as limits_conf:
     limits_conf.write('''
@@ -51,19 +55,6 @@ username = 'yosub_shin_0'
 home_directory_path = '/home/%s' % username
 uid = getpwnam(username)[2]
 
-print('Downloading private key for scp...')
-check_call(['/usr/local/bin/gsutil', 'cp', 'gs://bw-cassandra/sshuser_gcloud', '%s/' % home_directory_path],
-           stdout=open(os.devnull, 'wb'), stderr=STDOUT)
-os.chown('%s/sshuser_gcloud' % home_directory_path, uid, uid)
-
-os.setgid(uid)
-os.setuid(uid)
-
-# Let's install binaries first before we get hosts list (May potentially not get every host)
-print('Installing binaries...')
-check_call(['sudo', 'apt-get', 'install', '-y', 'git', 'emacs', 'byobu', 'apt-transport-https'],
-           stdout=open(os.devnull, 'wb'), stderr=STDOUT)
-
 instance_group_hosts = get_hosts()
 print('instance group hosts: %s' % ', '.join(instance_group_hosts))
 master_hostname = instance_group_hosts[0]
@@ -73,7 +64,26 @@ print('Current instance hostname: %s' % instance_hostname)
 if instance_hostname == master_hostname:
     print('Current host is the master node')
 
-name_node_hostname = master_hostname
+print('Downloading private key for scp...')
+check_call(['/usr/local/bin/gsutil', 'cp', 'gs://bw-cassandra/sshuser_gcloud', '%s/' % home_directory_path],
+           stdout=open(os.devnull, 'wb'), stderr=STDOUT)
+os.chown('%s/sshuser_gcloud' % home_directory_path, uid, uid)
+
+nfs_shared_path = '%s/result' % home_directory_path
+if instance_hostname == master_hostname:
+    print('Setting up NFS server...')
+    check_call(['mkdir', '-p', nfs_shared_path])
+    os.chown(nfs_shared_path, uid, uid)
+    check_call(['chmod', '755', nfs_shared_path])
+    with open('/etc/exports', 'a') as exports:
+        exports.write('%s   ' % nfs_shared_path)
+        exports.write(' '.join(map(lambda x: '%s(rw,sync,no_subtree_check)' % x, instance_group_hosts)))
+    check_call(['/etc/init.d/nfs-kernel-server', 'restart'])
+
+# Change to user level
+os.setgid(uid)
+os.setuid(uid)
+
 os.chdir(home_directory_path)
 
 # Download Java
@@ -158,3 +168,8 @@ check_call(['sudo', 'mount', '-t', 'tmpfs', '-o', 'size=40960M', 'tmpfs', '/tmp/
 print('Cloning git repository...')
 check_call(['git', 'clone', 'https://github.com/YosubShin/bw-cassandra.git'],
            stdout=open(os.devnull, 'wb'), stderr=STDOUT)
+
+if instance_hostname != master_hostname:
+    print('Mounting NFS directory...')
+    check_call(['mkdir', '-p', nfs_shared_path])
+    check_call(['sudo', 'mount', '%s:%s' % (master_hostname, nfs_shared_path), nfs_shared_path])

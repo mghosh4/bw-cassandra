@@ -396,7 +396,7 @@ def main():
     result_file_name = strftime('%m-%d-%H%M') + '.tar.gz'
 
     result_base_path = pf.get_result_base_path()
-    os.system('mkdir %s' % result_base_path)
+    os.system('mkdir -p %s' % result_base_path)
 
     repeat = int(pf.config.get('experiment', 'repeat'))
 
