@@ -7,6 +7,7 @@ from subprocess import STDOUT, check_call
 import os
 import subprocess
 from pwd import getpwnam
+from time import sleep
 
 
 def get_external_ip():
@@ -54,6 +55,9 @@ root    -   nofile   500000
 username = 'yosub_shin_0'
 home_directory_path = '/home/%s' % username
 uid = getpwnam(username)[2]
+
+# Wait before all hosts are detected
+sleep(30)
 
 instance_group_hosts = get_hosts()
 print('instance group hosts: %s' % ', '.join(instance_group_hosts))
