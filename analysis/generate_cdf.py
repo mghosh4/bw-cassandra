@@ -10,9 +10,9 @@ import numpy
 import time
 import ast
 
-from analysis import ycsb_parser
+import ycsb_parser
 
-data_base_path = os.path.abspath('../../data/consistency-rf3')
+data_base_path = os.path.abspath('../../data/latency')
 
 output_dir_name = time.strftime('%m-%d-%H%M')
 output_dir_path = '%s/processed/%s' % (data_base_path, output_dir_name)
@@ -24,8 +24,8 @@ except:
 raw_data_root = '%s/raw' % data_base_path
 
 profile_dicts = {}
-prob_rows_dict = {'bw': [], 'emulab': []}
-for profile_name in ['bw', 'emulab']:
+prob_rows_dict = {'bw': [], 'gcloud': []}
+for profile_name in ['bw', 'gcloud']:
     for job_id in os.listdir('%s/%s' % (raw_data_root, profile_name)):
         job_path = '%s/%s/%s' % (raw_data_root, profile_name, job_id)
         if not os.path.isdir(job_path):
@@ -96,22 +96,22 @@ for rw in ['read', 'update']:
     paths = filter(lambda x: re.search('.*cumulative\-%s\-.*\.csv' % rw, x) is not None,
                    ['%s/%s' % (output_dir_path, x) for x in os.listdir(output_dir_path)])
     bw_path = filter(lambda x: x.find('bw') != -1, paths)[0]
-    emulab_path = filter(lambda x: x.find('emulab') != -1, paths)[0]
+    gcloud_path = filter(lambda x: x.find('gcloud') != -1, paths)[0]
 
     output_path = '%s/%s-cdf.png' % (output_dir_path, rw)
 
-    os.system('./plot-latency-cdf.sh --rw=%s --output_path=%s --bw=%s --emulab=%s' %
-              (rw, output_path, bw_path, emulab_path))
+    os.system('./plot-latency-cdf.sh --rw=%s --output_path=%s --bw=%s --gcloud=%s' %
+              (rw, output_path, bw_path, gcloud_path))
 
 
-for profile_name in profile_dicts.keys():
-    df = pd.DataFrame(prob_rows_dict[profile_name])
-    grouped = df.groupby('time')
-    df = grouped.mean()
-    csv_file_path = '%s/%s-consistency-probability.csv' % (output_dir_path, profile_name)
-    df.to_csv(csv_file_path)
-
-output_path = '%s/consistency-probability.png' % output_dir_path
-os.system('./plot-consistency-probability.sh --output_path=%s --bw=%s --emulab=%s' %
-              (output_path, '%s/bw-consistency-probability.csv' % output_dir_path,
-               '%s/emulab-consistency-probability.csv' % output_dir_path))
+# for profile_name in profile_dicts.keys():
+#     df = pd.DataFrame(prob_rows_dict[profile_name])
+#     grouped = df.groupby('time')
+#     df = grouped.mean()
+#     csv_file_path = '%s/%s-consistency-probability.csv' % (output_dir_path, profile_name)
+#     df.to_csv(csv_file_path)
+#
+# output_path = '%s/consistency-probability.png' % output_dir_path
+# os.system('./plot-consistency-probability.sh --output_path=%s --bw=%s --gcloud=%s' %
+#               (output_path, '%s/bw-consistency-probability.csv' % output_dir_path,
+#                '%s/gcloud-consistency-probability.csv' % output_dir_path))

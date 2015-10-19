@@ -15,8 +15,8 @@ case $i in
     BW="${i#*=}"
     shift
     ;;
-    --emulab=*)
-    EMULAB="${i#*=}"
+    --gcloud=*)
+    GCLOUD="${i#*=}"
     shift
     ;;
     *)
@@ -47,6 +47,6 @@ set key right bottom
 set datafile separator ","
 
 plot    "${BW}" using 1:2 title 'bw' with linespoints ls 2, \
-    	"${EMULAB}" using 1:2 title 'emulab' with linespoints ls 3
+    	"${GCLOUD}" using 1:2 title 'gcloud' with linespoints ls 3
 
 EOF
