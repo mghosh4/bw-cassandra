@@ -56,7 +56,7 @@ class BlueWatersProfile(BaseProfile):
         return 128
 
     def get_max_num_connections_per_cassandra_node(self):
-        return 128  # 8 connections per core (according to Solving Big Data Challenges paper)
+        return 16
 
 
 class GCloudProfile(BaseProfile):
@@ -105,10 +105,10 @@ class GCloudProfile(BaseProfile):
         return 25
 
     def get_max_allowed_num_ycsb_threads_per_node(self):
-        return 256
+        return 128
 
     def get_max_num_connections_per_cassandra_node(self):
-        return 128  # 8 connections per core (according to Solving Big Data Challenges paper)
+        return 16
 
 
 class EmulabProfile(BaseProfile):
