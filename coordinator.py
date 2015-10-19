@@ -252,6 +252,30 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, total_nu
 
 
 # differ throughputs
+def experiment_on_latency(pf, num_cassandra_nodes, repeat):
+    default_num_records = int(pf.config.get('experiment', 'default_num_records'))
+    default_workload_type = pf.config.get('experiment', 'default_workload_type')
+    default_replication_factor = int(pf.config.get('experiment', 'default_replication_factor'))
+
+    for run in range(repeat):
+        total_num_ycsb_threads = pf.get_max_num_connections_per_cassandra_node() * num_cassandra_nodes
+        total_num_records = default_num_records * num_cassandra_nodes
+        num_ycsb_nodes = total_num_ycsb_threads / pf.get_max_allowed_num_ycsb_threads_per_node() + 1
+        logger.debug('num_cassandra_nodes=%d, total_num_ycsb_threads=%d, num_ycsb_nodes=%d, total_num_records=%d'
+                     % (num_cassandra_nodes, total_num_ycsb_threads, num_ycsb_nodes, total_num_records))
+
+        result = run_experiment(pf,
+                                hosts=pf.get_hosts(),
+                                overall_target_throughput=None,
+                                total_num_records=default_num_records * num_cassandra_nodes,
+                                workload_type=default_workload_type,
+                                replication_factor=default_replication_factor,
+                                num_cassandra_nodes=num_cassandra_nodes,
+                                num_ycsb_nodes=num_ycsb_nodes,
+                                total_num_ycsb_threads=total_num_ycsb_threads)
+
+
+# differ throughputs
 def experiment_on_throughputs(pf, num_cassandra_nodes, repeat):
     default_num_records = int(pf.config.get('experiment', 'default_num_records'))
     default_workload_type = pf.config.get('experiment', 'default_workload_type')
@@ -401,7 +425,8 @@ def main():
     repeat = int(pf.config.get('experiment', 'repeat'))
 
     # Do all experiments here
-    experiment_on_throughputs(pf, int(pf.config.get('experiment', 'default_num_cassandra_nodes')), repeat)
+    experiment_on_latency(pf, int(pf.config.get('experiment', 'default_num_cassandra_nodes')), repeat)
+    # experiment_on_throughputs(pf, int(pf.config.get('experiment', 'default_num_cassandra_nodes')), repeat)
     # experiment_on_num_cassandra_nodes_and_throughput(pf, repeat)
     # experiment_on_num_cassandra_nodes_with_no_throughput_limit(pf, repeat)
     # experiment_on_num_ycsb_threads(pf)
