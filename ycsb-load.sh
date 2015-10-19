@@ -100,7 +100,7 @@ hosts=${HOSTS}
 port=9042
 columnfamily=usertable
 
-histogram.buckets=10000
+histogram.buckets=1000000
 
 cassandra.writeconsistencylevel=QUORUM
 cassandra.readconsistencylevel=QUORUM

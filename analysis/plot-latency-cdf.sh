@@ -41,12 +41,12 @@ set logscale x
 set xtic auto                          # set xtics automatically
 set ytic auto                          # set ytics automatically
 set yrange [0:1]
-set xrange [1:100]
+set xrange [0.1:100]
 set key right bottom
 
 set datafile separator ","
 
-plot    "${BW}" using 1:2 title 'bw' with linespoints ls 2, \
-    	"${GCLOUD}" using 1:2 title 'gcloud' with linespoints ls 3
+plot    "${BW}" using (\$1 / 1000.0):2 title 'bw' with linespoints ls 2, \
+    	"${GCLOUD}" using (\$1 / 1000.0):2 title 'gcloud' with linespoints ls 3
 
 EOF
