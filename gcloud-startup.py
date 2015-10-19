@@ -72,7 +72,7 @@ print('Downloading private key for scp...')
 check_call(['/usr/local/bin/gsutil', 'cp', 'gs://bw-cassandra/sshuser_gcloud', '%s/' % home_directory_path],
            stdout=open(os.devnull, 'wb'), stderr=STDOUT)
 os.chown('%s/sshuser_gcloud' % home_directory_path, uid, uid)
-os.chmod('%s/sshuser_gcloud' % home_directory_path, 600)
+os.chmod('%s/sshuser_gcloud' % home_directory_path, 0600)
 os.rename('%s/sshuser_gcloud' % home_directory_path, '%s/sshuser_key' % home_directory_path)
 
 nfs_shared_path = '%s/result' % home_directory_path

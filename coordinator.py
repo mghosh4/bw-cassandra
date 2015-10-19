@@ -81,7 +81,7 @@ class YcsbExecuteThread(Thread):
 
 def run_experiment(pf, hosts, overall_target_throughput, workload_type, total_num_records, replication_factor,
                    num_cassandra_nodes, num_ycsb_nodes, total_num_ycsb_threads, cassandra_version='2.1.3',
-                   predict_pbs=False):
+                   predict_pbs=False, read_consistency_level='ONE', write_consistency_level='ONE'):
     cassandra_path = pf.config.get('path', 'cassandra_path')
     cassandra_home_base_path = pf.config.get('path', 'cassandra_home_base_path')
     ycsb_path = pf.config.get('path', 'ycsb_path')
@@ -168,10 +168,12 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, total_nu
     ret = os.system('ssh %s \'sh %s/ycsb-load.sh '
                     '--cassandra_path=%s --ycsb_path=%s '
                     '--base_path=%s --num_records=%d --workload=%s '
-                    '--replication_factor=%d --seed_host=%s --hosts=%s --num_threads=%d\''
+                    '--replication_factor=%d --seed_host=%s --hosts=%s --num_threads=%d '
+                    '--read_consistency=%s --write_consistency=%s\''
                     % (hosts[num_cassandra_nodes], src_path, cassandra_path, ycsb_path,
                        result_path, total_num_records, workload_type,
-                       replication_factor, seed_host, cassandra_nodes_hosts, num_ycsb_threads))
+                       replication_factor, seed_host, cassandra_nodes_hosts, num_ycsb_threads,
+                       read_consistency_level, write_consistency_level))
     if ret != 0:
         raise Exception('Unable to finish YCSB script')
 

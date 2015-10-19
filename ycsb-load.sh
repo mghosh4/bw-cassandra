@@ -42,6 +42,14 @@ case $i in
     NUM_THREADS="${i#*=}"
     shift
     ;;
+    --read_consistency=*)
+    READ_CONSISTENCY="${i#*=}"
+    shift
+    ;;
+    --write_consistency=*)
+    WRITE_CONSISTENCY="${i#*=}"
+    shift
+    ;;
     *)
             # unknown option
     ;;
@@ -102,10 +110,10 @@ columnfamily=usertable
 
 histogram.buckets=1000000
 
-cassandra.writeconsistencylevel=QUORUM
-cassandra.readconsistencylevel=QUORUM
+cassandra.writeconsistencylevel=${WRITE_CONSISTENCY}
+cassandra.readconsistencylevel=${READ_CONSISTENCY}
 
 EOF
 
 # Load YCSB Workload
-${YCSB_PATH}/bin/ycsb load cassandra-cql -s -P ${BASE_PATH}/workload.txt -p maxexecutiontime=600 > ${BASE_PATH}/load-output.txt
+${YCSB_PATH}/bin/ycsb load cassandra-cql -s -P ${BASE_PATH}/workload.txt -p maxexecutiontime=600 -p threadcount=128 > ${BASE_PATH}/load-output.txt
