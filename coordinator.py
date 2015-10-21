@@ -258,6 +258,8 @@ def experiment_on_latency(pf, num_cassandra_nodes, repeat):
     default_num_records = int(pf.config.get('experiment', 'default_num_records'))
     default_workload_type = pf.config.get('experiment', 'default_workload_type')
     default_replication_factor = int(pf.config.get('experiment', 'default_replication_factor'))
+    default_read_consistency_level = pf.config.get('experiment', 'default_read_consistency_level')
+    default_write_consistency_level = pf.config.get('experiment', 'default_write_consistency_level')
 
     for run in range(repeat):
         total_num_ycsb_threads = pf.get_max_num_connections_per_cassandra_node() * num_cassandra_nodes
@@ -274,7 +276,9 @@ def experiment_on_latency(pf, num_cassandra_nodes, repeat):
                                 replication_factor=default_replication_factor,
                                 num_cassandra_nodes=num_cassandra_nodes,
                                 num_ycsb_nodes=num_ycsb_nodes,
-                                total_num_ycsb_threads=total_num_ycsb_threads)
+                                total_num_ycsb_threads=total_num_ycsb_threads,
+                                read_consistency_level=default_read_consistency_level,
+                                write_consistency_level=default_write_consistency_level)
 
 
 # differ throughputs
