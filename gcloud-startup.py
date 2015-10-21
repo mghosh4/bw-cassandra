@@ -37,6 +37,7 @@ def get_hosts():
     lines = lines[1:]
     return sorted(filter(lambda l: len(l) > 0, map(lambda l: l.split(' ')[0], lines)))
 
+check_call(['gcloud', 'compute', 'instance-groups', 'managed', 'wait-until-stable', get_instance_group_name(), '--zone', 'us-central1-f'])
 
 # Let's install binaries first before we get hosts list (May potentially not get every host)
 print('Installing binaries...')
@@ -55,9 +56,6 @@ root    -   nofile   500000
 username = 'yosub_shin_0'
 home_directory_path = '/home/%s' % username
 uid = getpwnam(username)[2]
-
-# Wait before all hosts are detected
-sleep(30)
 
 instance_group_hosts = get_hosts()
 print('instance group hosts: %s' % ', '.join(instance_group_hosts))

@@ -95,13 +95,17 @@ for profile_name in profile_dicts.keys():
 for rw in ['read', 'update']:
     paths = filter(lambda x: re.search('.*cumulative\-%s\-.*\.csv' % rw, x) is not None,
                    ['%s/%s' % (output_dir_path, x) for x in os.listdir(output_dir_path)])
-    bw_path = filter(lambda x: x.find('bw') != -1, paths)[0]
-    gcloud_path = filter(lambda x: x.find('gcloud') != -1, paths)[0]
+    print paths
+    bw_path = filter(lambda x: x.split('/')[-1].find('bw') != -1, paths)[0]
+    gcloud_path = filter(lambda x: x.split('/')[-1].find('gcloud') != -1, paths)[0]
 
     output_path = '%s/%s-cdf.png' % (output_dir_path, rw)
 
     os.system('./plot-latency-cdf.sh --rw=%s --output_path=%s --bw=%s --gcloud=%s' %
               (rw, output_path, bw_path, gcloud_path))
+
+    print('./plot-latency-cdf.sh --rw=%s --output_path=%s --bw=%s --gcloud=%s' %
+          (rw, output_path, bw_path, gcloud_path))
 
 
 # for profile_name in profile_dicts.keys():
