@@ -2,7 +2,7 @@
 
 1. SSH into Blue Waters system with `ssh <id>@bw.ncsa.illinois.edu`. Upon prompted for password, type the ordinary password followed by OTP generated password.
 
-2. The project directory is under `/sciteam/projects/sciteam/jsb`. I recommend you to create a new directory under your username, since this is shared among our research group. Scratch directory is under `/u/sciteam/<user_id>/scratch`, or you can access the same directory `~/scratch`. The scratch directory it purged after 30 days, so I ended up using the project directory.
+2. The project directory is under `/projects/sciteam/jsb`. I recommend you to create a new directory under your username, since this is shared among our research group. Scratch directory is under `/u/sciteam/<user_id>/scratch`, or you can access the same directory `~/scratch`. The scratch directory it purged after 30 days, so I ended up using the project directory.
 
 # Initialization of Blue Waters node for the first time
 
