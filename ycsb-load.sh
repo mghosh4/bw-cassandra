@@ -88,16 +88,16 @@ recordcount=${NUM_RECORDS}
 
 # Run YCSB for 100 seconds
 # Safe limit of operation count to accomodate for running 300 seconds with 1M ops/s
-operationcount= 300000000
+operationcount=1000
 maxexecutiontime=60
 workload=com.yahoo.ycsb.workloads.CoreWorkload
 
 readallfields=true
 
-readproportion=0.95
-updateproportion=0.05
+readproportion=0
+updateproportion=0
 scanproportion=0
-insertproportion=0
+insertproportion=1
 
 requestdistribution=${WORKLOAD}
 
@@ -116,4 +116,13 @@ cassandra.readconsistencylevel=${READ_CONSISTENCY}
 EOF
 
 # Load YCSB Workload
-${YCSB_PATH}/bin/ycsb load cassandra-cql -s -P ${BASE_PATH}/workload.txt -p maxexecutiontime=600 -p threadcount=128 > ${BASE_PATH}/load-output.txt
+${YCSB_PATH}/bin/ycsb load cassandra-cql -s -P ${BASE_PATH}/workload.txt -p maxexecutiontime=600 -p threadcount=128 -p operationcount=300000000> ${BASE_PATH}/load-output.txt
+
+cat > /tmp/cql_tracing.txt <<EOF
+TRACING ON
+EOF
+
+# Setup keyspace and column family in Cassandra for YCSB workload
+${CASSANDRA_PATH}/bin/cqlsh --file=/tmp/cql_tracing.txt ${SEED_HOST}
+
+sleep 10

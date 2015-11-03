@@ -251,6 +251,7 @@ def run_experiment(pf, hosts, overall_target_throughput, workload_type, total_nu
     meta_file = open('%s/meta.ini' % result_path, 'w')
     meta.write(meta_file)
     meta_file.close()
+    sys.exit()
 
 
 # differ throughputs
