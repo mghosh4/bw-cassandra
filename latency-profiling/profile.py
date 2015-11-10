@@ -24,8 +24,8 @@ class BlueWatersProfile(BaseProfile):
     # Get host names in .crayccm file
     def get_hosts(self):
         hosts = set()
-        for fn in os.listdir('/u/sciteam/shin1/.crayccm/'):
-            f = open('/u/sciteam/shin1/.crayccm/%s' % fn)
+        for fn in os.listdir('/u/sciteam/ghosh1/.crayccm/'):
+            f = open('/u/sciteam/ghosh1/.crayccm/%s' % fn)
             lines = f.read().splitlines()
             for line in lines:
                 host = line

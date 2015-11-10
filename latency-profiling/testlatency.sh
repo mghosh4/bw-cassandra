@@ -1,17 +1,18 @@
 #!/bin/bash
 
-mkdir -p $1
+resultpath="/u/sciteam/ghosh1/scratch/result/16384"
 NUM_PINGS=30
 
 filename=`hostname`
-filename="$filename".log
+latencyfilename="$filename_latency".log
+trfilename="$filename_tr".log
 
-nodenames=$(echo $3 | tr "," "\n")
+nodenames=$(cat /projects/sciteam/jsb/ghosh1/result/hostlist | awk '{system("rca-helper -x "$1)}')
 
 for name in $nodenames
 do
 	if [ `hostname` != $name ]; then
-		echo "From" $filename "pinging" $name
-		ping -i 0.2 -s $2 -c $NUM_PINGS $name >> $1/$filename
+		ping -i 0.2 -s 16384 -c $NUM_PINGS $name >> $resultpath/$latencyfilename
+		/usr/sbin/traceroute $name >> $resultpath/$trfilename
 	fi
 done

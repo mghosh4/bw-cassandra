@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.DEBUG,
                            '%(message)s')
 logger = logging.getLogger(__name__)
 
-src_path = '/projects/sciteam/jsb/shin1/bw-cassandra'
+src_path = '/projects/sciteam/jsb/ghosh1/bw-cassandra'
 
 class RunExperimentThread(Thread):
     def __init__(self, result_base_path, host, packet_size, destinations):
@@ -38,7 +38,7 @@ def main():
     packet_sizes = [64, 1024, 4096, 16384]
     all_hosts = pf.get_hosts()
 
-    result_base_path = '/projects/sciteam/jsb/shin1/latency/%s' % job_id
+    result_base_path = '/projects/sciteam/jsb/ghosh1/latency/%s' % job_id
 
     for packet_size in packet_sizes:
         logger.debug('Running experiment for packet_size: %d' % packet_size)
