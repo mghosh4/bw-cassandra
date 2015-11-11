@@ -4,8 +4,8 @@ resultpath="/u/sciteam/ghosh1/scratch/result/16384"
 NUM_PINGS=30
 
 filename=`hostname`
-latencyfilename="$filename_latency".log
-trfilename="$filename_tr".log
+latencyfilename="$filename"_latency.log
+trfilename="$filename"_tr.log
 
 nodenames=$(cat /projects/sciteam/jsb/ghosh1/result/hostlist | awk '{system("rca-helper -x "$1)}')
 
